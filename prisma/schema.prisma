@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  transactions Transaction[]
+  categories   Category[]
+  goals        Goal[]
+
+  @@map("users")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  color     String
+  icon      String
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  goals        Goal[]
+
+  @@map("categories")
+}
+
+model Transaction {
+  id         String          @id @default(uuid())
+  title      String
+  amount     Decimal         @db.Decimal(10, 2)
+  type       TransactionType
+  date       DateTime
+  notes      String?
+  userId     String          @map("user_id")
+  categoryId String?         @map("category_id")
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+  @@index([userId, type])
+  @@index([userId, categoryId])
+  @@map("transactions")
+}
+
+model Goal {
+  id            String     @id @default(uuid())
+  title         String
+  targetAmount  Decimal    @map("target_amount") @db.Decimal(10, 2)
+  currentAmount Decimal    @default(0) @map("current_amount") @db.Decimal(10, 2)
+  deadline      DateTime
+  status        GoalStatus @default(IN_PROGRESS)
+  userId        String     @map("user_id")
+  categoryId    String?    @map("category_id")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@map("goals")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum GoalStatus {
+  IN_PROGRESS
+  ACHIEVED
+  CANCELLED
+}
