@@ -9,7 +9,8 @@
     "build": "tsup src --out-dir build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +22,7 @@
     "@types/node": "25.6.0",
     "@types/pg": "8.20.0",
     "@vitest/coverage-v8": "4.1.5",
+    "@vitest/ui": "4.1.5",
     "eslint": "8.57.1",
     "i": "^0.3.7",
     "npm": "^11.13.0",
