@@ -22,5 +22,6 @@ export interface CreateTransactionInput {
 }
 
 export interface TransactionsRepository {
+  findById(id: string): Promise<Transaction | null>
   create(data: CreateTransactionInput): Promise<Transaction>
 }

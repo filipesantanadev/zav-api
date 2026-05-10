@@ -8,7 +8,17 @@ import { randomUUID } from 'crypto'
 export class InMemoryTransactionsRepository implements TransactionsRepository {
   public items: Transaction[] = []
 
-  async create(data: CreateTransactionInput): Promise<Transaction> {
+  async findById(id: string) {
+    const transaction = this.items.find((item) => item.id === id)
+
+    if (!transaction) {
+      return null
+    }
+
+    return transaction
+  }
+
+  async create(data: CreateTransactionInput) {
     const transaction: Transaction = {
       id: randomUUID(),
       title: data.title,
