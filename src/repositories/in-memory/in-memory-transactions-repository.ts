@@ -2,6 +2,7 @@ import type {
   CreateTransactionInput,
   TransactionsRepository,
   Transaction,
+  UpdateTransactionInput,
 } from '../transactions-repository'
 import { randomUUID } from 'node:crypto'
 
@@ -35,5 +36,27 @@ export class InMemoryTransactionsRepository implements TransactionsRepository {
     this.items.push(transaction)
 
     return transaction
+  }
+
+  async update(id: string, data: UpdateTransactionInput) {
+    const index = this.items.findIndex((item) => item.id === id)
+    const current = this.items[index]!
+
+    const updated: Transaction = {
+      id,
+      title: data.title ?? current.title,
+      amount: data.amount ?? current.amount,
+      type: data.type ?? current.type,
+      date: data.date ?? current.date,
+      notes: data.notes !== undefined ? data.notes : current.notes,
+      userId: current.userId,
+      categoryId:
+        data.categoryId !== undefined ? data.categoryId : current.categoryId,
+      createdAt: current.createdAt,
+      updatedAt: new Date(),
+    }
+
+    this.items[index] = updated
+    return updated
   }
 }
