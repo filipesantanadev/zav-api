@@ -1,9 +1,9 @@
 import type {
   CreateTransactionInput,
-  Transaction,
   TransactionsRepository,
+  Transaction,
 } from '../transactions-repository'
-import { randomUUID } from 'crypto'
+import { randomUUID } from 'node:crypto'
 
 export class InMemoryTransactionsRepository implements TransactionsRepository {
   public items: Transaction[] = []
