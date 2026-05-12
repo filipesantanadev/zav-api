@@ -21,6 +21,7 @@ interface FetchTransactionsUseCaseResponse {
   transactions: Transaction[]
   total: number
   page: number
+  perPage: number
   totalPages: number
 }
 
