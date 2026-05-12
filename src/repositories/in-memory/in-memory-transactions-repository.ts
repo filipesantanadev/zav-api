@@ -67,6 +67,25 @@ export class InMemoryTransactionsRepository implements TransactionsRepository {
     }
   }
 
+  async getMonthlySummary(userId: string, startDate: Date, endDate: Date) {
+    const transactions = this.items.filter(
+      (item) =>
+        item.userId === userId &&
+        dayjs(item.date).isAfter(dayjs(startDate).subtract(1, 'day')) &&
+        dayjs(item.date).isBefore(dayjs(endDate).add(1, 'day')),
+    )
+
+    const totalIncome = transactions
+      .filter((t) => t.type === 'INCOME')
+      .reduce((acc, t) => acc + t.amount, 0)
+
+    const totalExpense = transactions
+      .filter((t) => t.type === 'EXPENSE')
+      .reduce((acc, t) => acc + t.amount, 0)
+
+    return { totalIncome, totalExpense }
+  }
+
   async create(data: CreateTransactionInput) {
     const transaction: Transaction = {
       id: randomUUID(),

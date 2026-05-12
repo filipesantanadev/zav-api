@@ -46,11 +46,21 @@ export interface FetchTransactionsResponse {
   total: number
 }
 
+export interface MonthlySummary {
+  totalIncome: number
+  totalExpense: number
+}
+
 export interface TransactionsRepository {
   findById(id: string): Promise<Transaction | null>
   findManyWithFilters(
     filters: FetchTransactionsFilters,
   ): Promise<FetchTransactionsResponse>
+  getMonthlySummary(
+    userId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<MonthlySummary>
   create(data: CreateTransactionInput): Promise<Transaction>
   update(id: string, data: UpdateTransactionInput): Promise<Transaction>
 }
