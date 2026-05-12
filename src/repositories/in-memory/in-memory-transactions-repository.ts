@@ -1,8 +1,10 @@
+import dayjs from 'dayjs'
 import type {
   CreateTransactionInput,
   TransactionsRepository,
   Transaction,
   UpdateTransactionInput,
+  FetchTransactionsFilters,
 } from '../transactions-repository'
 import { randomUUID } from 'node:crypto'
 
@@ -17,6 +19,52 @@ export class InMemoryTransactionsRepository implements TransactionsRepository {
     }
 
     return transaction
+  }
+
+  async findManyWithFilters(filters: FetchTransactionsFilters) {
+    let transactions = this.items.filter(
+      (item) => item.userId === filters.userId,
+    )
+
+    if (filters.type) {
+      transactions = transactions.filter((item) => item.type === filters.type)
+    }
+
+    if (filters.categoryId) {
+      transactions = transactions.filter(
+        (item) => item.categoryId === filters.categoryId,
+      )
+    }
+
+    if (filters.search) {
+      transactions = transactions.filter((item) =>
+        item.title.toLowerCase().includes(filters.search!.toLowerCase()),
+      )
+    }
+
+    if (filters.startDate) {
+      transactions = transactions.filter((item) =>
+        dayjs(item.date).isAfter(dayjs(filters.startDate).subtract(1, 'day')),
+      )
+    }
+
+    if (filters.endDate) {
+      transactions = transactions.filter((item) =>
+        dayjs(item.date).isBefore(dayjs(filters.endDate).add(1, 'day')),
+      )
+    }
+
+    const total = transactions.length
+
+    const paginated = transactions.slice(
+      (filters.page - 1) * filters.perPage,
+      filters.page * filters.perPage,
+    )
+
+    return {
+      transactions: paginated,
+      total,
+    }
   }
 
   async create(data: CreateTransactionInput) {

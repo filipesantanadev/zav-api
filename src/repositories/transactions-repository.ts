@@ -17,6 +17,17 @@ export interface UpdateTransactionInput {
   categoryId?: string | null
 }
 
+export interface FetchTransactionsFilters {
+  userId: string
+  page: number
+  perPage: number
+  type?: 'INCOME' | 'EXPENSE' | undefined
+  categoryId?: string | undefined
+  search?: string | undefined
+  startDate?: Date | undefined
+  endDate?: Date | undefined
+}
+
 export interface Transaction {
   id: string
   title: string
@@ -30,8 +41,16 @@ export interface Transaction {
   updatedAt: Date
 }
 
+export interface FetchTransactionsResponse {
+  transactions: Transaction[]
+  total: number
+}
+
 export interface TransactionsRepository {
   findById(id: string): Promise<Transaction | null>
+  findManyWithFilters(
+    filters: FetchTransactionsFilters,
+  ): Promise<FetchTransactionsResponse>
   create(data: CreateTransactionInput): Promise<Transaction>
   update(id: string, data: UpdateTransactionInput): Promise<Transaction>
 }
