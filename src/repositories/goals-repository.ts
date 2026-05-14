@@ -28,8 +28,20 @@ export interface UpdateGoalProgressInput {
   status: GoalStatus
 }
 
+export interface FetchGoalsFilters {
+  userId: string
+  page: number
+  perPage: number
+}
+
+export interface FetchGoalsResponse {
+  goals: Goal[]
+  total: number
+}
+
 export interface GoalsRepository {
   findById(id: string): Promise<Goal | null>
+  findManyByUserId(filters: FetchGoalsFilters): Promise<FetchGoalsResponse>
   updateProgress(id: string, data: UpdateGoalProgressInput): Promise<Goal>
   create(data: CreateGoalInput): Promise<Goal>
 }

@@ -1,5 +1,6 @@
 import type {
   CreateGoalInput,
+  FetchGoalsFilters,
   Goal,
   GoalsRepository,
   UpdateGoalProgressInput,
@@ -17,6 +18,22 @@ export class InMemoryGoalsRepository implements GoalsRepository {
     }
 
     return goal
+  }
+
+  async findManyByUserId(filters: FetchGoalsFilters) {
+    const goals = this.items.filter((item) => item.userId === filters.userId)
+
+    const paginated = goals.slice(
+      (filters.page - 1) * filters.perPage,
+      filters.page * filters.perPage,
+    )
+
+    const total = goals.length
+
+    return {
+      goals: paginated,
+      total,
+    }
   }
 
   async updateProgress(id: string, data: UpdateGoalProgressInput) {
