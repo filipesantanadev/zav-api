@@ -5,6 +5,24 @@ import { randomUUID } from 'node:crypto'
 export class InMemoryCategoriesRepository implements CategoriesRepository {
   public items: Category[] = []
 
+  async findManyByUserId(filters: FetchCategoriesFilters) {
+    const categories = this.items.filter(
+      (item) => item.userId === filters.userId,
+    )
+
+    const paginated = categories.slice(
+      (filters.page - 1) * filters.perPage,
+      filters.page * filters.perPage,
+    )
+
+    const total = categories.length
+
+    return {
+      categories: paginated,
+      total,
+    }
+  }
+
   async findNameByUserId(name: string, userId: string) {
     const category = this.items.find(
       (item) =>
