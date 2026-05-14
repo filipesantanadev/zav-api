@@ -1,9 +1,22 @@
 import type { Category, Prisma } from '@prisma/client'
-import type { CategoriesRepository } from '../categories-repository'
+import type {
+  CategoriesRepository,
+  FetchCategoriesFilters,
+} from '../categories-repository'
 import { randomUUID } from 'node:crypto'
 
 export class InMemoryCategoriesRepository implements CategoriesRepository {
   public items: Category[] = []
+
+  async findById(id: string) {
+    const category = this.items.find((item) => item.id === id)
+
+    if (!category) {
+      return null
+    }
+
+    return category
+  }
 
   async findManyByUserId(filters: FetchCategoriesFilters) {
     const categories = this.items.filter(
@@ -51,5 +64,10 @@ export class InMemoryCategoriesRepository implements CategoriesRepository {
     this.items.push(category)
 
     return category
+  }
+
+  async delete(id: string) {
+    const index = this.items.findIndex((item) => item.id === id)
+    this.items.splice(index, 1)
   }
 }

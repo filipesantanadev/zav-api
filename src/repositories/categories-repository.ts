@@ -11,9 +11,11 @@ export interface FetchCategoriesResponse {
   total: number
 }
 export interface CategoriesRepository {
+  findById(id: string): Promise<Category | null>
   findManyByUserId(
     filters: FetchCategoriesFilters,
   ): Promise<FetchCategoriesResponse>
   findNameByUserId(name: string, userId: string): Promise<Category | null>
   create(data: Prisma.CategoryUncheckedCreateInput): Promise<Category>
+  delete(id: string): Promise<void>
 }
