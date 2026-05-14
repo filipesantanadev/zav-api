@@ -63,4 +63,5 @@ export interface TransactionsRepository {
   ): Promise<MonthlySummary>
   create(data: CreateTransactionInput): Promise<Transaction>
   update(id: string, data: UpdateTransactionInput): Promise<Transaction>
+  delete(id: string): Promise<void>
 }

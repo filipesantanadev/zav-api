@@ -1,15 +1,9 @@
-import type {
-  Transaction,
-  TransactionsRepository,
-} from '@/repositories/transactions-repository'
+import type { TransactionsRepository } from '@/repositories/transactions-repository'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 
 interface DeleteTransactionUseCaseRequest {
   id: string
-}
-
-interface DeleteTransactionUseCaseResponse {
-  transaction: Transaction
+  userId: string
 }
 
 export class DeleteTransactionUseCase {
@@ -17,15 +11,18 @@ export class DeleteTransactionUseCase {
 
   async execute({
     id,
-  }: DeleteTransactionUseCaseRequest): Promise<DeleteTransactionUseCaseResponse> {
+    userId,
+  }: DeleteTransactionUseCaseRequest): Promise<void> {
     const transaction = await this.transactionsRepository.findById(id)
 
     if (!transaction) {
       throw new ResourceNotFoundError()
     }
 
-    return {
-      transaction,
+    if (transaction.userId !== userId) {
+      throw new ResourceNotFoundError()
     }
+
+    await this.transactionsRepository.delete(id)
   }
 }

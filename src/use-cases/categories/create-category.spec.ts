@@ -38,6 +38,6 @@ describe('Create Category Use Case', () => {
         icon: 'foto.png',
         userId: 'user-1',
       }),
-    ).rejects.instanceOf(ResourceNotFoundError)
+    ).rejects.toBeInstanceOf(ResourceNotFoundError)
   })
 })
