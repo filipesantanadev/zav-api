@@ -11,7 +11,7 @@ describe('List Categories Use Case', () => {
     sut = new ListCategoriesUseCase(categoriesRepository)
   })
 
-  it('should be able to fetch a transactions', async () => {
+  it('should be able to fetch a categories', async () => {
     for (let i = 0; i <= 20; i++) {
       await categoriesRepository.create({
         name: 'title-' + `${i}`,
@@ -37,7 +37,7 @@ describe('List Categories Use Case', () => {
     expect(categories).toHaveLength(20)
   })
 
-  it('should be able to fetch a transactions', async () => {
+  it('should not be able to fetch a categories created by another user', async () => {
     for (let i = 0; i <= 20; i++) {
       await categoriesRepository.create({
         name: 'title-' + `${i}`,
