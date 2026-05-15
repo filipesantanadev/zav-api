@@ -1,5 +1,7 @@
-import type { UsersRepository } from '@/repositories/users-repository'
-import type { User } from '@prisma/client'
+import type {
+  PublicUser,
+  UsersRepository,
+} from '@/repositories/users-repository'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 
 interface GetUserProfileUseCaseRequest {
@@ -7,7 +9,7 @@ interface GetUserProfileUseCaseRequest {
 }
 
 interface GetUserProfileUseCaseResponse {
-  user: User
+  user: PublicUser
 }
 
 export class GetUserProfileUseCase {
@@ -22,8 +24,10 @@ export class GetUserProfileUseCase {
       throw new ResourceNotFoundError()
     }
 
+    const { passwordHash: _, ...userWithoutPassword } = user
+
     return {
-      user,
+      user: userWithoutPassword,
     }
   }
 }

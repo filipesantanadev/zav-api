@@ -23,10 +23,12 @@ describe('Get User Profile Use Case', () => {
     const { user } = await sut.execute({ userId: createUser.id })
 
     expect(user.id).toEqual(expect.any(String))
-    expect(user.name).toEqual(expect.any(String))
+    expect(user.name).toEqual('John Doe')
+    expect(user.email).toEqual('johndoe@example.com')
+    expect(user).not.toHaveProperty('passwordHash')
   })
 
-  it('should not be able to authenticate with wrong email', async () => {
+  it('should not be able to get user profile when user not found', async () => {
     await expect(() =>
       sut.execute({
         userId: 'non-existing-user-id',
