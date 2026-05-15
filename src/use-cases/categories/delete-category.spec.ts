@@ -51,6 +51,6 @@ describe('Delete Category Use Case', () => {
         id: 'non-existent-id',
         userId: 'user-1',
       }),
-    ).rejects.toBeInstanceOf(Error)
+    ).rejects.toBeInstanceOf(ResourceNotFoundError)
   })
 })
