@@ -43,6 +43,7 @@ export interface GoalsRepository {
   findById(id: string): Promise<Goal | null>
   findManyByUserId(filters: FetchGoalsFilters): Promise<FetchGoalsResponse>
   updateProgress(id: string, data: UpdateGoalProgressInput): Promise<Goal>
+  updateStatus(id: string, status: GoalStatus): Promise<Goal>
   create(data: CreateGoalInput): Promise<Goal>
   delete(id: string): Promise<void>
 }

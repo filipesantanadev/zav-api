@@ -3,6 +3,7 @@ import type {
   FetchGoalsFilters,
   Goal,
   GoalsRepository,
+  GoalStatus,
   UpdateGoalProgressInput,
 } from '../goals-repository'
 import { randomUUID } from 'node:crypto'
@@ -44,6 +45,20 @@ export class InMemoryGoalsRepository implements GoalsRepository {
       ...current,
       currentAmount: data.currentAmount,
       status: data.status,
+      updatedAt: new Date(),
+    }
+
+    this.items[index] = updated
+    return updated
+  }
+
+  async updateStatus(id: string, status: GoalStatus) {
+    const index = this.items.findIndex((item) => item.id === id)
+    const current = this.items[index]!
+
+    const updated: Goal = {
+      ...current,
+      status,
       updatedAt: new Date(),
     }
 
