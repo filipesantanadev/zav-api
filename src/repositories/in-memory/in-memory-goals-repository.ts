@@ -4,6 +4,7 @@ import type {
   Goal,
   GoalsRepository,
   GoalStatus,
+  UpdateGoalInput,
   UpdateGoalProgressInput,
 } from '../goals-repository'
 import { randomUUID } from 'node:crypto'
@@ -59,6 +60,30 @@ export class InMemoryGoalsRepository implements GoalsRepository {
     const updated: Goal = {
       ...current,
       status,
+      updatedAt: new Date(),
+    }
+
+    this.items[index] = updated
+    return updated
+  }
+
+  async update(id: string, data: UpdateGoalInput) {
+    const index = this.items.findIndex((item) => item.id === id)
+    const current = this.items[index]!
+
+    const updated: Goal = {
+      id: current.id,
+      title: data.title ?? current.title,
+      targetAmount: data.targetAmount ?? current.targetAmount,
+      currentAmount: current.currentAmount,
+      deadline: data.deadline ?? current.deadline,
+      status: current.status,
+      userId: current.userId,
+      categoryId:
+        'categoryId' in data // ← verifica se o campo foi enviado
+          ? (data.categoryId ?? null) // ← foi enviado: usa o valor (null ou string)
+          : current.categoryId, // ← não foi enviado: mantém o atual
+      createdAt: current.createdAt,
       updatedAt: new Date(),
     }
 
