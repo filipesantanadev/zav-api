@@ -3,7 +3,7 @@ import { UpdateGoalUseCase } from '@/use-cases/goals/update-goal'
 
 export function makeUpdateGoalUseCase() {
   const goalsRepository = new PrismaGoalsRepository()
-  const updateGoalUseCase = new UpdateGoalUseCase(goalsRepository)
+  const useCase = new UpdateGoalUseCase(goalsRepository)
 
-  return updateGoalUseCase
+  return useCase
 }

@@ -3,9 +3,7 @@ import { FetchTransactionsUseCase } from '@/use-cases/transactions/fetch-transac
 
 export function makeFetchTransactionsUseCase() {
   const transactionsRepository = new PrismaTransactionsRepository()
-  const fetchTransactionsUseCase = new FetchTransactionsUseCase(
-    transactionsRepository,
-  )
+  const useCase = new FetchTransactionsUseCase(transactionsRepository)
 
-  return fetchTransactionsUseCase
+  return useCase
 }

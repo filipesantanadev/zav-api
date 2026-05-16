@@ -3,9 +3,7 @@ import { DeleteTransactionUseCase } from '@/use-cases/transactions/delete-transa
 
 export function makeDeleteTransactionUseCase() {
   const transactionsRepository = new PrismaTransactionsRepository()
-  const deleteTransactionUseCase = new DeleteTransactionUseCase(
-    transactionsRepository,
-  )
+  const useCase = new DeleteTransactionUseCase(transactionsRepository)
 
-  return deleteTransactionUseCase
+  return useCase
 }

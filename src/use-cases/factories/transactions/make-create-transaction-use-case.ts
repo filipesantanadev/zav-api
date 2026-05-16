@@ -3,9 +3,7 @@ import { CreateTransactionUseCase } from '@/use-cases/transactions/create-transa
 
 export function makeCreateTransactionUseCase() {
   const transactionsRepository = new PrismaTransactionsRepository()
-  const createTransactionUseCase = new CreateTransactionUseCase(
-    transactionsRepository,
-  )
+  const useCase = new CreateTransactionUseCase(transactionsRepository)
 
-  return createTransactionUseCase
+  return useCase
 }

@@ -3,7 +3,7 @@ import { ListCategoriesUseCase } from '@/use-cases/categories/list-categories'
 
 export function makeListCategoriesUseCase() {
   const categoriesRepository = new PrismaCategoriesRepository()
-  const listCategoriesUseCase = new ListCategoriesUseCase(categoriesRepository)
+  const useCase = new ListCategoriesUseCase(categoriesRepository)
 
-  return listCategoriesUseCase
+  return useCase
 }

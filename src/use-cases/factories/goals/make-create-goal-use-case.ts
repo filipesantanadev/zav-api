@@ -3,7 +3,7 @@ import { CreateGoalUseCase } from '@/use-cases/goals/create-goal'
 
 export function makeCreateGoalUseCase() {
   const goalsRepository = new PrismaGoalsRepository()
-  const createGoalUseCase = new CreateGoalUseCase(goalsRepository)
+  const useCase = new CreateGoalUseCase(goalsRepository)
 
-  return createGoalUseCase
+  return useCase
 }

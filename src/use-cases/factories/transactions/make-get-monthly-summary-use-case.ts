@@ -3,9 +3,7 @@ import { GetMonthlySummaryUseCase } from '@/use-cases/transactions/get-monthly-s
 
 export function makeGetMonthlySummaryUseCase() {
   const transactionsRepository = new PrismaTransactionsRepository()
-  const getMonthlySummaryUseCase = new GetMonthlySummaryUseCase(
-    transactionsRepository,
-  )
+  const useCase = new GetMonthlySummaryUseCase(transactionsRepository)
 
-  return getMonthlySummaryUseCase
+  return useCase
 }
