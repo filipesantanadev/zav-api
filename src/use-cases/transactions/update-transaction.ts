@@ -8,7 +8,7 @@ import { FutureDateTransactionError } from '../errors/future-date-transaction-er
 import dayjs from 'dayjs'
 
 interface UpdateTransactionUseCaseRequest {
-  transactionId: string
+  id: string
   userId: string
   title?: string
   amount?: number
@@ -26,7 +26,7 @@ export class UpdateTransactionUseCase {
   constructor(private transactionsRepository: TransactionsRepository) {}
 
   async execute({
-    transactionId,
+    id,
     userId,
     title,
     amount,
@@ -35,8 +35,7 @@ export class UpdateTransactionUseCase {
     notes,
     categoryId,
   }: UpdateTransactionUseCaseRequest): Promise<UpdateTransactionUseCaseResponse> {
-    const transaction =
-      await this.transactionsRepository.findById(transactionId)
+    const transaction = await this.transactionsRepository.findById(id)
 
     if (!transaction) {
       throw new ResourceNotFoundError()
@@ -54,17 +53,14 @@ export class UpdateTransactionUseCase {
       throw new FutureDateTransactionError()
     }
 
-    const updatedTransaction = await this.transactionsRepository.update(
-      transactionId,
-      {
-        ...(title !== undefined && { title }),
-        ...(amount !== undefined && { amount }),
-        ...(type !== undefined && { type }),
-        ...(date !== undefined && { date }),
-        ...(notes !== undefined && { notes }),
-        ...(categoryId !== undefined && { categoryId }),
-      },
-    )
+    const updatedTransaction = await this.transactionsRepository.update(id, {
+      ...(title !== undefined && { title }),
+      ...(amount !== undefined && { amount }),
+      ...(type !== undefined && { type }),
+      ...(date !== undefined && { date }),
+      ...(notes !== undefined && { notes }),
+      ...(categoryId !== undefined && { categoryId }),
+    })
 
     return {
       transaction: updatedTransaction,

@@ -26,7 +26,7 @@ describe('Update Transaction Use Case', () => {
     })
 
     const { transaction: updatedTransaction } = await sut.execute({
-      transactionId: transaction.id,
+      id: transaction.id,
       userId: 'user-1',
       title: 'Updated Salary',
       amount: 6000,
@@ -49,7 +49,7 @@ describe('Update Transaction Use Case', () => {
     })
 
     const { transaction: updatedTransaction } = await sut.execute({
-      transactionId: transaction.id,
+      id: transaction.id,
       userId: 'user-1',
       title: 'Buy a new Guitar',
       amount: 6000,
@@ -73,7 +73,7 @@ describe('Update Transaction Use Case', () => {
     })
 
     const { transaction: updatedTransaction } = await sut.execute({
-      transactionId: transaction.id,
+      id: transaction.id,
       userId: 'user-1',
       notes: 'Received payment for the project I did for Google',
     })
@@ -99,7 +99,7 @@ describe('Update Transaction Use Case', () => {
     })
 
     const { transaction: updatedTransaction } = await sut.execute({
-      transactionId: transaction.id,
+      id: transaction.id,
       userId: 'user-1',
     })
 
@@ -116,7 +116,7 @@ describe('Update Transaction Use Case', () => {
     })
 
     const { transaction: updatedTransaction } = await sut.execute({
-      transactionId: transaction.id,
+      id: transaction.id,
       userId: 'user-1',
       date: dayjs().subtract(1, 'month').toDate(),
     })
@@ -135,7 +135,7 @@ describe('Update Transaction Use Case', () => {
     })
 
     const { transaction: updatedTransaction } = await sut.execute({
-      transactionId: transaction.id,
+      id: transaction.id,
       userId: 'user-1',
       categoryId: null,
     })
@@ -146,7 +146,7 @@ describe('Update Transaction Use Case', () => {
   it('should not be able to update a transaction that does not exist', async () => {
     await expect(() =>
       sut.execute({
-        transactionId: 'non-existent-id',
+        id: 'non-existent-id',
         userId: 'user-1',
         title: 'New Title',
         type: 'EXPENSE',
@@ -166,7 +166,7 @@ describe('Update Transaction Use Case', () => {
 
     await expect(() =>
       sut.execute({
-        transactionId: transaction.id,
+        id: transaction.id,
         userId: 'user-2',
         title: 'Buy a new Guitar',
         amount: 0,
@@ -187,7 +187,7 @@ describe('Update Transaction Use Case', () => {
 
     await expect(() =>
       sut.execute({
-        transactionId: transaction.id,
+        id: transaction.id,
         userId: 'user-1',
         title: 'Buy a new Guitar',
         amount: 0,
@@ -208,7 +208,7 @@ describe('Update Transaction Use Case', () => {
 
     await expect(() =>
       sut.execute({
-        transactionId: transaction.id,
+        id: transaction.id,
         userId: 'user-1',
         date: dayjs().add(1, 'day').toDate(),
       }),
