@@ -38,15 +38,17 @@ describe('List Categories (With Pagination) (e2e)', () => {
       { name: 'Other', color: '#64748B', icon: 'circle-ellipsis' },
     ]
 
-    for (const category of categories)
-      await request(app.server)
+    for (const category of categories) {
+      const createCategoryResponse = await request(app.server)
         .post('/categories')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          name: `${category?.name}`,
-          color: `${category?.color}`,
-          icon: `${category?.icon}`,
+          name: category.name,
+          color: category.color,
+          icon: category.icon,
         })
+      expect(createCategoryResponse.statusCode).toBe(201)
+    }
 
     const response = await request(app.server)
       .get('/categories')
