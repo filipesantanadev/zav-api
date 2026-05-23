@@ -51,6 +51,13 @@ export interface MonthlySummary {
   totalExpense: number
 }
 
+export interface ExpenseByCategory {
+  categoryId: string | null
+  categoryName: string | null
+  total: number
+  percentage: number
+}
+
 export interface TransactionsRepository {
   findById(id: string): Promise<Transaction | null>
   findManyWithFilters(
@@ -61,6 +68,11 @@ export interface TransactionsRepository {
     startDate: Date,
     endDate: Date,
   ): Promise<MonthlySummary>
+  getExpensesByCategory(
+    userId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<ExpenseByCategory[]>
   create(data: CreateTransactionInput): Promise<Transaction>
   update(id: string, data: UpdateTransactionInput): Promise<Transaction>
   delete(id: string): Promise<void>

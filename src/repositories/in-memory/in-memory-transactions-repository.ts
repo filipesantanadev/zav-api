@@ -5,6 +5,7 @@ import type {
   Transaction,
   UpdateTransactionInput,
   FetchTransactionsFilters,
+  ExpenseByCategory,
 } from '../transactions-repository'
 import { randomUUID } from 'node:crypto'
 
@@ -84,6 +85,42 @@ export class InMemoryTransactionsRepository implements TransactionsRepository {
       .reduce((acc, t) => acc + t.amount, 0)
 
     return { totalIncome, totalExpense }
+  }
+
+  async getExpensesByCategory(userId: string, startDate: Date, endDate: Date) {
+    const expenses = this.items.filter(
+      (item) =>
+        item.userId === userId &&
+        item.type === 'EXPENSE' &&
+        dayjs(item.date).isAfter(dayjs(startDate).subtract(1, 'day')) &&
+        dayjs(item.date).isBefore(dayjs(endDate).add(1, 'day')),
+    )
+
+    // agrupa por categoryId e soma os valores
+    const grouped = expenses.reduce(
+      (acc, item) => {
+        const key = item.categoryId ?? 'uncategorized'
+        if (!acc[key]) {
+          acc[key] = { categoryId: item.categoryId, total: 0 }
+        }
+        acc[key].total += item.amount
+        return acc
+      },
+      {} as Record<string, { categoryId: string | null; total: number }>,
+    )
+
+    const totalExpenses = Object.values(grouped).reduce(
+      (acc, item) => acc + item.total,
+      0,
+    )
+
+    return Object.values(grouped).map((item) => ({
+      categoryId: item.categoryId,
+      categoryName: null, // ← in-memory não tem join com categories
+      total: item.total,
+      percentage:
+        totalExpenses > 0 ? Math.round((item.total / totalExpenses) * 100) : 0,
+    }))
   }
 
   async create(data: CreateTransactionInput) {

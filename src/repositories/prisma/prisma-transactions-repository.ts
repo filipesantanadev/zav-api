@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import type {
   CreateTransactionInput,
+  ExpenseByCategory,
   FetchTransactionsFilters,
   Transaction,
   TransactionsRepository,
@@ -93,6 +94,50 @@ export class PrismaTransactionsRepository implements TransactionsRepository {
       totalIncome: income._sum.amount?.toNumber() ?? 0,
       totalExpense: expense._sum.amount?.toNumber() ?? 0,
     }
+  }
+
+  async getExpensesByCategory(userId: string, startDate: Date, endDate: Date) {
+    const result = await prisma.transaction.groupBy({
+      by: ['categoryId'],
+      where: {
+        userId,
+        type: 'EXPENSE',
+        date: { gte: startDate, lte: endDate },
+      },
+      _sum: { amount: true },
+      orderBy: { _sum: { amount: 'desc' } },
+    })
+
+    const totalExpenses = result.reduce(
+      (acc, item) => acc + (item._sum.amount?.toNumber() ?? 0),
+      0,
+    )
+
+    // busca os nomes das categorias
+    const categoryIds = result
+      .map((item) => item.categoryId)
+      .filter((id): id is string => id !== null)
+
+    const categories = await prisma.category.findMany({
+      where: { id: { in: categoryIds } },
+      select: { id: true, name: true },
+    })
+
+    const categoryMap = new Map(categories.map((c) => [c.id, c.name]))
+
+    return result.map((item) => {
+      const total = item._sum.amount?.toNumber() ?? 0
+
+      return {
+        categoryId: item.categoryId,
+        categoryName: item.categoryId
+          ? (categoryMap.get(item.categoryId) ?? null)
+          : null,
+        total,
+        percentage:
+          totalExpenses > 0 ? Math.round((total / totalExpenses) * 100) : 0,
+      }
+    })
   }
 
   async create(data: CreateTransactionInput) {
