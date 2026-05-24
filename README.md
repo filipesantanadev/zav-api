@@ -69,8 +69,8 @@ O **ZAV Finances** é uma API de controle financeiro pessoal desenvolvida com fo
 
 | Categoria     | Tecnologia                   |
 | ------------- | ---------------------------- |
-| Logs          | Pino                         |
 | Documentação  | Swagger (`@fastify/swagger`) |
+| Logs          | Pino                         |
 | Monitoramento | Prometheus + Grafana         |
 
 ---
