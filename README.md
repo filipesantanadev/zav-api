@@ -11,8 +11,6 @@
 
 ## 📋 Índice
 
-## 📋 Índice
-
 - [Sobre o Projeto](#-sobre-o-projeto)
 - [Funcionalidades](#-funcionalidades)
 - [Tecnologias](#-tecnologias)
@@ -70,10 +68,11 @@ O **ZAV Finances** é uma API de controle financeiro pessoal desenvolvida com fo
 
 ## 🚀 Tecnologias Planejadas
 
-| Categoria     | Tecnologia           |
-| ------------- | -------------------- |
-| Logs          | Pino                 |
-| Monitoramento | Prometheus + Grafana |
+| Categoria     | Tecnologia                   |
+| ------------- | ---------------------------- |
+| Logs          | Pino                         |
+| Documentação  | Swagger (`@fastify/swagger`) |
+| Monitoramento | Prometheus + Grafana         |
 
 ---
 
