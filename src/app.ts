@@ -8,9 +8,16 @@ import { transactionsRoutes } from './http/controllers/transactions/routes'
 import { categoriesRoutes } from './http/controllers/categories/routes'
 import { goalsRoutes } from './http/controllers/goals/routes'
 import { dashboardRoutes } from './http/controllers/dashboards/routes'
+import { swaggerPlugin } from './http/plugins/swagger'
+import fastifySwagger from '@fastify/swagger'
+import fastifySwaggerUi from '@fastify/swagger-ui'
 
 export const app = fastify()
 
+const { swagger, swaggerUi } = swaggerPlugin()
+
+app.register(fastifySwagger, swagger)
+app.register(fastifySwaggerUi, swaggerUi)
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
   cookie: {

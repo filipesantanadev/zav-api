@@ -4,12 +4,18 @@ import { verifyJWT } from '@/http/middlewares/verify-jwt'
 import { remove } from './delete'
 import { update } from './update'
 import { search } from './search'
+import {
+  createTransactionSchema,
+  deleteTransactionSchema,
+  fetchTransactionsSchema,
+  updateTransactionSchema,
+} from '@/http/schemas/transactions'
 
 export async function transactionsRoutes(app: FastifyInstance) {
   app.addHook('onRequest', verifyJWT)
 
-  app.get('/transactions', search)
-  app.post('/transactions', create)
-  app.patch('/transactions/:id', update)
-  app.delete('/transactions/:id', remove)
+  app.get('/transactions', { schema: fetchTransactionsSchema }, search)
+  app.post('/transactions', { schema: createTransactionSchema }, create)
+  app.patch('/transactions/:id', { schema: updateTransactionSchema }, update)
+  app.delete('/transactions/:id', { schema: deleteTransactionSchema }, remove)
 }
