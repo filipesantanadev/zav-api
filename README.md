@@ -68,10 +68,10 @@ O **ZAV Finances** é uma API de controle financeiro pessoal desenvolvida com fo
 
 ## 🚀 Tecnologias Planejadas
 
-| Categoria     | Tecnologia                   |
-| ------------- | ---------------------------- |
-| Logs          | Pino                         |
-| Monitoramento | Prometheus + Grafana         |
+| Categoria     | Tecnologia |
+| ------------- | ---------- |
+| Logs          | Pino       |
+| Monitoramento | Sentry     |
 
 ---
 
@@ -348,11 +348,12 @@ src/
 - [x] Cache com Redis
 - [x] Testes unitários e e2e
 - [x] Documentação com Swagger
+- [x] CI/CD com GitHub Actions
 
 ### Próximos passos
 
 - [ ] Logs estruturados com Pino
-- [ ] Monitoramento e métricas com Prometheus + Grafana
+- [ ] Monitoramento e métricas com Sentry
 - [ ] Deploy
 
 ---

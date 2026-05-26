@@ -2,6 +2,9 @@ name: Run Unit Tests
 
 on:
   push:
+    branches:
+      - main
+      - develop
   pull_request:
 
 jobs:
@@ -21,6 +24,9 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci
+
+      - name: Gerar Prisma Client
+        run: npx prisma generate
 
       - name: Executar testes unitários
         run: npm run test

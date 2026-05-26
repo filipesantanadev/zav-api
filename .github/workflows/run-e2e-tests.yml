@@ -12,6 +12,7 @@ jobs:
       DATABASE_URL: postgresql://docker:docker@localhost:5432/apizav?schema=public
       REDIS_HOST: localhost
       REDIS_PORT: 6379
+      PORT: 3333
 
     services:
       postgres:
@@ -22,11 +23,21 @@ jobs:
           POSTGRESQL_USERNAME: docker
           POSTGRESQL_PASSWORD: docker
           POSTGRESQL_DATABASE: apizav
+        options: >-
+          --health-cmd "pg_isready -U docker"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
       redis:
         image: redis:7
         ports:
           - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +52,9 @@ jobs:
 
       - name: Gerar Prisma Client
         run: npx prisma generate
+
+      - name: Rodar migrations
+        run: npx prisma migrate deploy
 
       - name: Executar testes E2E
         run: npm run test:e2e
