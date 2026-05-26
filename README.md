@@ -50,28 +50,28 @@ O **ZAV Finances** é uma API de controle financeiro pessoal desenvolvida com fo
 
 ## 🛠️ Tecnologias
 
-| Camada          | Tecnologia              |
-| --------------- | ----------------------- |
-| Runtime         | Node.js v22             |
-| Linguagem       | TypeScript              |
-| Framework HTTP  | Fastify                 |
-| ORM             | Prisma                  |
-| Banco de Dados  | PostgreSQL 16           |
-| Cache           | Redis 7                 |
-| Validação       | Zod                     |
-| Testes          | Vitest                  |
-| Autenticação    | JWT                     |
-| Containerização | Docker + Docker Compose |
+| Camada          | Tecnologia                   |
+| --------------- | ---------------------------- |
+| Runtime         | Node.js v22                  |
+| Linguagem       | TypeScript                   |
+| Framework HTTP  | Fastify                      |
+| ORM             | Prisma                       |
+| Banco de Dados  | PostgreSQL 16                |
+| Cache           | Redis 7                      |
+| Validação       | Zod                          |
+| Testes          | Vitest                       |
+| Autenticação    | JWT                          |
+| Containerização | Docker + Docker Compose      |
+| Documentação    | Swagger (`@fastify/swagger`) |
 
 ---
 
 ## 🚀 Tecnologias Planejadas
 
-| Categoria     | Tecnologia                   |
-| ------------- | ---------------------------- |
-| Documentação  | Swagger (`@fastify/swagger`) |
-| Logs          | Pino                         |
-| Monitoramento | Prometheus + Grafana         |
+| Categoria     | Tecnologia           |
+| ------------- | -------------------- |
+| Logs          | Pino                 |
+| Monitoramento | Prometheus + Grafana |
 
 ---
 
@@ -225,7 +225,9 @@ REDIS_PORT=6379
 | ------ | ------------ | -------------------------- |
 | `GET`  | `/dashboard` | Resumo financeiro completo |
 
-> 🚧 A documentação interativa via Swagger será disponibilizada após implementação.
+### Documentação
+
+A documentação completa da API está disponível em `http://localhost:3333/docs` após iniciar o servidor.
 
 ---
 
@@ -282,8 +284,18 @@ src/
 │   ├── middlewares/            # Middlewares do Fastify
 │   │   └── verify-jwt.ts
 │   │
-│   └── presenters/             # Transformação/formatação de respostas
-│       └── goal-presenter.ts
+│   ├── plugins/                # Plugins do Fastify
+│   │   └── swagger.ts          # Configuração do Swagger/OpenAPI
+│   │
+│   ├── presenters/             # Transformação/formatação de respostas
+│   │   └── goal-presenter.ts
+│   │
+│   └── schemas/                # Schemas de documentação OpenAPI por domínio
+│       ├── categories.ts
+│       ├── dashboard.ts
+│       ├── goals.ts
+│       ├── transactions.ts
+│       └── users.ts
 │
 ├── infra/                      # Serviços externos e infraestrutura
 │   └── cache/
@@ -335,10 +347,10 @@ src/
 - [x] Dashboard consolidado
 - [x] Cache com Redis
 - [x] Testes unitários e e2e
+- [x] Documentação com Swagger
 
 ### Próximos passos
 
-- [ ] Documentação com Swagger
 - [ ] Logs estruturados com Pino
 - [ ] Monitoramento e métricas com Prometheus + Grafana
 - [ ] Deploy

@@ -1,9 +1,10 @@
 import type { FastifyInstance } from 'fastify'
 import { verifyJWT } from '@/http/middlewares/verify-jwt'
 import { getDashboard } from './get-dashboard'
+import { getDashboardSchema } from '@/http/schemas/dashboard'
 
 export async function dashboardRoutes(app: FastifyInstance) {
   app.addHook('onRequest', verifyJWT)
 
-  app.get('/dashboard', getDashboard)
+  app.get('/dashboard', { schema: getDashboardSchema }, getDashboard)
 }
