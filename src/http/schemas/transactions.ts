@@ -9,7 +9,7 @@ export const createTransactionSchema = {
       title: { type: 'string', description: 'Salário', default: 'Salário' },
       amount: { type: 'number', default: 10000 },
       type: { type: 'string', enum: ['INCOME', 'EXPENSE'], default: 'INCOME' },
-      date: { type: 'string', format: 'date-time' },
+      date: { type: 'string', format: 'date' },
       notes: { type: 'string', nullable: true },
       categoryId: {
         type: 'string',
@@ -53,23 +53,65 @@ export const fetchTransactionsSchema = {
   tags: ['Transactions'],
   summary: 'Listar transações com filtros e paginação',
   security: [{ bearerAuth: [] }],
+
   querystring: {
     type: 'object',
     properties: {
       type: { type: 'string', enum: ['INCOME', 'EXPENSE'] },
       categoryId: { type: 'string', format: 'uuid' },
       search: { type: 'string' },
-      startDate: { type: 'string', format: 'date-time' },
-      endDate: { type: 'string', format: 'date-time' },
+      startDate: { type: 'string' },
+      endDate: { type: 'string' },
       page: { type: 'integer', default: 1 },
       perPage: { type: 'integer', default: 20 },
     },
   },
+
   response: {
     200: {
       type: 'object',
+
       properties: {
-        transactions: { type: 'array', items: { type: 'object' } },
+        transactions: {
+          type: 'array',
+
+          items: {
+            type: 'object',
+
+            properties: {
+              id: { type: 'string', format: 'uuid' },
+              title: { type: 'string' },
+              amount: { type: 'number' },
+              type: {
+                type: 'string',
+                enum: ['INCOME', 'EXPENSE'],
+              },
+              notes: { type: 'string' },
+              date: { type: 'string', format: 'date-time' },
+
+              categoryId: {
+                type: 'string',
+                format: 'uuid',
+              },
+
+              userId: {
+                type: 'string',
+                format: 'uuid',
+              },
+
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+              },
+
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+              },
+            },
+          },
+        },
+
         total: { type: 'integer' },
         page: { type: 'integer' },
         perPage: { type: 'integer' },
