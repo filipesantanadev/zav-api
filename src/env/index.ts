@@ -8,7 +8,7 @@ const envSchema = z.object({
   APP_URL: z.string(),
   JWT_SECRET: z.string(),
   PORT: z.coerce.number().default(3333),
-  REDIS_HOST: z.string().default('localhost'),
+  REDIS_HOST: z.string().optional(),
   REDIS_PORT: z.coerce.number().default(6379),
 })
 
