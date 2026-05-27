@@ -5,6 +5,7 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
     .default('development'),
+  APP_URL: z.string(),
   JWT_SECRET: z.string(),
   PORT: z.coerce.number().default(3333),
   REDIS_HOST: z.string().default('localhost'),
