@@ -23,7 +23,7 @@ describe('Delete Transaction (e2e)', () => {
         title: 'Salary DEV Full-Stack',
         amount: 8500,
         type: 'INCOME',
-        date: new Date(),
+        date: new Date().toISOString().split('T')[0],
       })
 
     const transactionId = transactionCreated.body.transaction.id

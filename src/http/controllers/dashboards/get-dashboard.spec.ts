@@ -87,7 +87,7 @@ describe('Get Dashboard (e2e)', () => {
           title: transaction.title,
           amount: transaction.amount,
           type: transaction.type,
-          date: transaction.date.toISOString(),
+          date: transaction.date.toISOString().split('T')[0],
         })
 
       expect(response.statusCode).toBe(201)

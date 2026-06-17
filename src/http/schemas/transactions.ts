@@ -31,7 +31,7 @@ export const createTransactionSchema = {
             title: { type: 'string' },
             amount: { type: 'number' },
             type: { type: 'string', enum: ['INCOME', 'EXPENSE'] },
-            date: { type: 'string', format: 'date-time' },
+            date: { type: 'string', format: 'date' },
             notes: { type: 'string', nullable: true },
             userId: { type: 'string', format: 'uuid' },
             categoryId: { type: 'string', format: 'uuid', nullable: true },
@@ -87,7 +87,7 @@ export const fetchTransactionsSchema = {
                 enum: ['INCOME', 'EXPENSE'],
               },
               notes: { type: 'string' },
-              date: { type: 'string', format: 'date-time' },
+              date: { type: 'string', format: 'date' },
 
               categoryId: {
                 type: 'string',

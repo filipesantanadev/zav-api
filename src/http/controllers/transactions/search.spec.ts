@@ -195,7 +195,7 @@ describe('Search Transactions (With Filter, Pagination) (e2e)', () => {
           title: transaction.title,
           amount: transaction.amount,
           type: transaction.type,
-          date: transaction.date,
+          date: transaction.date.toISOString().split('T')[0],
         })
 
       expect(createdTransaction.statusCode).toBe(201)
