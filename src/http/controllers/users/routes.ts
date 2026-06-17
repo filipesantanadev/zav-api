@@ -12,8 +12,22 @@ import {
 } from '@/http/schemas/users'
 
 export async function usersRoutes(app: FastifyInstance) {
-  app.post('/users', { schema: registerUserSchema }, register)
-  app.post('/sessions', { schema: authenticateUserSchema }, authenticate)
+  app.post(
+    '/users',
+    {
+      schema: registerUserSchema,
+      config: { rateLimit: { max: 5, timeWindow: '1 minute' } },
+    },
+    register,
+  )
+  app.post(
+    '/sessions',
+    {
+      schema: authenticateUserSchema,
+      config: { rateLimit: { max: 10, timeWindow: '1 minute' } },
+    },
+    authenticate,
+  )
 
   app.patch('/token/refresh', { schema: refreshTokenSchema }, refresh)
 

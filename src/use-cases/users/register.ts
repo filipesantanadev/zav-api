@@ -21,7 +21,7 @@ export class RegisterUseCase {
     email,
     password,
   }: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
-    const passwordHash = await hash(password, 6)
+    const passwordHash = await hash(password, 12)
 
     const userWithSameEmail = await this.usersRepository.findByEmail(email)
 
