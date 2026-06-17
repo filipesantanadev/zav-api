@@ -17,5 +17,5 @@ const adapter = new PrismaPg(pool, { schema })
 
 export const prisma = new PrismaClient({
   adapter,
-  log: env.NODE_ENV === 'dev' ? ['query'] : [],
+  log: env.NODE_ENV === 'development' ? ['query'] : [],
 })
