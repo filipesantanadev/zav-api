@@ -26,10 +26,11 @@ describe('Update User Use Case', () => {
       id: user.id,
       name: 'John Doe',
       email: 'johndoe@example.com',
-      password: await hash('0987654321', 6),
+      password: '0987654321',
     })
 
     expect(updatedUser.name).toEqual('John Doe')
+    expect(updatedUser.email).toEqual('johndoe@example.com')
   })
 
   it('should be able to update only the name', async () => {

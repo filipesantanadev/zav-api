@@ -81,4 +81,13 @@ describe('Update Profile (e2e)', () => {
 
     expect(response.statusCode).toEqual(401)
   })
+
+  it('should return 400 when email format is invalid', async () => {
+    const response = await request(app.server)
+      .patch('/me')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: 'not-an-email' })
+
+    expect(response.statusCode).toEqual(400)
+  })
 })

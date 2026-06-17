@@ -119,6 +119,11 @@ export const updateUserProfileSchema = {
         },
       },
     },
+    404: {
+      description: 'Usuário não encontrado',
+      type: 'object',
+      properties: { message: { type: 'string' } },
+    },
     409: {
       description: 'E-mail já cadastrado',
       type: 'object',
