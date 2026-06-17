@@ -10,7 +10,7 @@ export async function updateProfile(
   const updateProfileBodySchema = z.object({
     name: z.string().optional(),
     email: z.string().email().optional(),
-    password: z.string().min(6).optional(),
+    password: z.string().min(12).optional(),
   })
 
   const { name, email, password } = updateProfileBodySchema.parse(request.body)

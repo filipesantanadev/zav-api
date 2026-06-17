@@ -19,7 +19,7 @@ describe('Update User Use Case', () => {
     const user = await usersRepository.create({
       name: 'John Koe',
       email: 'johndoe123@example.com',
-      passwordHash: await hash('123456', 6),
+      passwordHash: await hash('password0123', 12),
     })
 
     const { user: updatedUser } = await sut.execute({
@@ -36,7 +36,7 @@ describe('Update User Use Case', () => {
     const user = await usersRepository.create({
       name: 'John Doe',
       email: 'johndoe@example.com',
-      passwordHash: await hash('123456', 6),
+      passwordHash: await hash('password0123', 12),
     })
 
     const { user: updatedUser } = await sut.execute({
@@ -52,7 +52,7 @@ describe('Update User Use Case', () => {
     const user = await usersRepository.create({
       name: 'John Doe',
       email: 'johndoe@example.com',
-      passwordHash: await hash('123456', 6),
+      passwordHash: await hash('password0123', 12),
     })
 
     await expect(
@@ -67,7 +67,7 @@ describe('Update User Use Case', () => {
     const user = await usersRepository.create({
       name: 'John Doe',
       email: 'johndoe@example.com',
-      passwordHash: await hash('123456', 6),
+      passwordHash: await hash('password0123', 12),
     })
 
     const { user: updatedUser } = await sut.execute({
@@ -82,7 +82,7 @@ describe('Update User Use Case', () => {
     const user = await usersRepository.create({
       name: 'John Doe',
       email: 'johndoe@example.com',
-      passwordHash: await hash('123456', 6),
+      passwordHash: await hash('password0123', 12),
     })
 
     await sut.execute({
@@ -109,13 +109,13 @@ describe('Update User Use Case', () => {
     const user = await usersRepository.create({
       name: 'John Koe',
       email: 'johndoe@example.com',
-      passwordHash: await hash('123456', 6),
+      passwordHash: await hash('password0123', 12),
     })
 
     await usersRepository.create({
       name: 'Chester Tyler',
       email: 'chester@example.com',
-      passwordHash: await hash('123456', 6),
+      passwordHash: await hash('password0123', 12),
     })
 
     await expect(() =>

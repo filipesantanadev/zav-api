@@ -11,7 +11,7 @@ export const registerUserSchema = {
         format: 'email',
         default: 'johndoe@example.com',
       },
-      password: { type: 'string', minLength: 6, default: '123456' },
+      password: { type: 'string', minLength: 12, default: 'password123' },
     },
   },
   response: {
@@ -40,7 +40,7 @@ export const authenticateUserSchema = {
         format: 'email',
         default: 'johndoe@example.com',
       },
-      password: { type: 'string', default: '123456' },
+      password: { type: 'string', default: 'password123' },
     },
   },
   response: {
@@ -100,7 +100,7 @@ export const updateUserProfileSchema = {
     properties: {
       name: { type: 'string' },
       email: { type: 'string', format: 'email' },
-      password: { type: 'string', minLength: 6 },
+      password: { type: 'string', minLength: 12 },
     },
   },
   response: {

@@ -4,8 +4,12 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createAndAuthenticateUser } from '@/utils/test/create-and-authenticate-user'
 
 describe('Update Profile (e2e)', () => {
+  let token: string
+
   beforeAll(async () => {
     await app.ready()
+    const auth = await createAndAuthenticateUser(app)
+    token = auth.token
   })
 
   afterAll(async () => {
@@ -13,8 +17,6 @@ describe('Update Profile (e2e)', () => {
   })
 
   it('should be able to update name', async () => {
-    const { token } = await createAndAuthenticateUser(app)
-
     const response = await request(app.server)
       .patch('/me')
       .set('Authorization', `Bearer ${token}`)
@@ -27,8 +29,6 @@ describe('Update Profile (e2e)', () => {
   })
 
   it('should be able to update email', async () => {
-    const { token } = await createAndAuthenticateUser(app)
-
     const response = await request(app.server)
       .patch('/me')
       .set('Authorization', `Bearer ${token}`)
@@ -41,8 +41,6 @@ describe('Update Profile (e2e)', () => {
   })
 
   it('should be able to update password', async () => {
-    const { token } = await createAndAuthenticateUser(app)
-
     const response = await request(app.server)
       .patch('/me')
       .set('Authorization', `Bearer ${token}`)
@@ -52,8 +50,6 @@ describe('Update Profile (e2e)', () => {
   })
 
   it('should not return passwordHash in the response', async () => {
-    const { token } = await createAndAuthenticateUser(app)
-
     const response = await request(app.server)
       .patch('/me')
       .set('Authorization', `Bearer ${token}`)
@@ -64,12 +60,10 @@ describe('Update Profile (e2e)', () => {
   })
 
   it('should not be able to update email to one already in use', async () => {
-    const { token } = await createAndAuthenticateUser(app)
-
     await request(app.server).post('/users').send({
       name: 'Other User',
       email: 'other@example.com',
-      password: '123456',
+      password: 'password0123',
     })
 
     const response = await request(app.server)
