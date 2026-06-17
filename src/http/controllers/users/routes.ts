@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify'
 import { register } from './register'
 import { authenticate } from './authenticate'
 import { profile } from './profile'
+import { updateProfile } from './update-profile'
 import { verifyJWT } from '@/http/middlewares/verify-jwt'
 import { refresh } from './refresh'
 import {
@@ -9,6 +10,7 @@ import {
   getUserProfileSchema,
   refreshTokenSchema,
   registerUserSchema,
+  updateUserProfileSchema,
 } from '@/http/schemas/users'
 
 export async function usersRoutes(app: FastifyInstance) {
@@ -35,5 +37,11 @@ export async function usersRoutes(app: FastifyInstance) {
     '/me',
     { onRequest: [verifyJWT], schema: getUserProfileSchema },
     profile,
+  )
+
+  app.patch(
+    '/me',
+    { onRequest: [verifyJWT], schema: updateUserProfileSchema },
+    updateProfile,
   )
 }

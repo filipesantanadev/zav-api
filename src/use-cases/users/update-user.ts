@@ -45,7 +45,7 @@ export class UpdateUserUseCase {
 
     if (name !== undefined) data.name = name
     if (email !== undefined) data.email = email
-    if (password !== undefined) data.passwordHash = await hash(password, 6)
+    if (password !== undefined) data.passwordHash = await hash(password, 12)
 
     const updatedUser = await this.usersRepository.update(id, data)
 

@@ -91,6 +91,42 @@ export const getUserProfileSchema = {
   },
 } as const
 
+export const updateUserProfileSchema = {
+  tags: ['Users'],
+  summary: 'Atualizar perfil do usuário autenticado',
+  security: [{ bearerAuth: [] }],
+  body: {
+    type: 'object',
+    properties: {
+      name: { type: 'string' },
+      email: { type: 'string', format: 'email' },
+      password: { type: 'string', minLength: 6 },
+    },
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: {
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            name: { type: 'string' },
+            email: { type: 'string', format: 'email' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+      },
+    },
+    409: {
+      description: 'E-mail já cadastrado',
+      type: 'object',
+      properties: { message: { type: 'string' } },
+    },
+  },
+} as const
+
 export const refreshTokenSchema = {
   tags: ['Users'],
   summary: 'Renovar token de acesso',
