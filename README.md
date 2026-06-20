@@ -2,10 +2,12 @@
 
 > API para controle financeiro pessoal — gerencie receitas, despesas, categorias e metas financeiras com segurança e performance.
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![Status](https://img.shields.io/badge/status-em%20produção-brightgreen)
 ![Node](https://img.shields.io/badge/node-v22-brightgreen)
-![TypeScript](https://img.shields.io/badge/typescript-5.x-blue)
+![TypeScript](https://img.shields.io/badge/typescript-6.x-blue)
 ![License](https://img.shields.io/badge/license-ISC-lightgrey)
+[![Deploy](https://img.shields.io/badge/deploy-Render-46E3B7?logo=render)](https://zap-api-uru0.onrender.com)
+[![Swagger](https://img.shields.io/badge/docs-Swagger-85EA2D?logo=swagger)](https://zap-api-uru0.onrender.com/docs)
 
 ---
 
@@ -15,6 +17,7 @@
 - [Funcionalidades](#-funcionalidades)
 - [Tecnologias](#-tecnologias)
 - [Arquitetura](#-arquitetura)
+- [Deploy](#-deploy)
 - [Pré-requisitos](#-pré-requisitos)
 - [Instalação e Execução](#-instalação-e-execução)
 - [Scripts](#-scripts)
@@ -100,6 +103,19 @@ Essa abordagem permite testar as regras de negócio de forma isolada usando **re
 
 ---
 
+## 🚀 Deploy
+
+A API está em produção no **Render**, com PostgreSQL e Redis provisionados na mesma plataforma.
+
+| Recurso | URL |
+|---|---|
+| API | https://zap-api-uru0.onrender.com |
+| Documentação Swagger | https://zap-api-uru0.onrender.com/docs |
+
+> O plano gratuito do Render pode apresentar cold start de alguns segundos na primeira requisição após período de inatividade.
+
+---
+
 ## 📦 Pré-requisitos
 
 - [Node.js](https://nodejs.org/) >= 22
@@ -136,6 +152,9 @@ npm run start:dev
 
 A API estará disponível em `http://localhost:3333`  
 Documentação Swagger: `http://localhost:3333/docs`
+
+Para testar sem rodar localmente, use o ambiente de produção:
+`https://zap-api-uru0.onrender.com/docs`
 
 ---
 
@@ -374,11 +393,11 @@ src/
 - [x] Logs estruturados em JSON via Pino
 - [x] Rate limiting (`@fastify/rate-limit`)
 - [x] CORS configurável por ambiente
+- [x] Deploy em produção (Render — PostgreSQL + Redis)
 
 ### Próximos passos
 
 - [ ] Monitoramento e métricas com Sentry
-- [ ] Deploy
 
 ---
 
