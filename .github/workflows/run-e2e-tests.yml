@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      APP_URL: http://localhost:3333
       JWT_SECRET: testing
       DATABASE_URL: postgresql://docker:docker@localhost:5432/apizav?schema=public
       REDIS_HOST: localhost
