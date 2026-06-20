@@ -169,4 +169,29 @@ describe('List Goals (With Pagination) (e2e)', () => {
     expect(response.body.perPage).toEqual(5)
     expect(response.body.totalPages).toEqual(4)
   })
+
+  it('should be able to list goals with perPage equal to 100', async () => {
+    const { token } = await createAndAuthenticateUser(app, 'jane@example.com')
+
+    const response = await request(app.server)
+      .get('/goals')
+      .query({ page: 1, perPage: 100 })
+      .set('Authorization', `Bearer ${token}`)
+      .send()
+
+    expect(response.statusCode).toEqual(200)
+    expect(response.body.perPage).toEqual(100)
+  })
+
+  it('should not be able to list goals with perPage greater than 100', async () => {
+    const { token } = await createAndAuthenticateUser(app, 'jane2@example.com')
+
+    const response = await request(app.server)
+      .get('/goals')
+      .query({ page: 1, perPage: 101 })
+      .set('Authorization', `Bearer ${token}`)
+      .send()
+
+    expect(response.statusCode).toEqual(400)
+  })
 })

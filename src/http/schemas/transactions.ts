@@ -63,7 +63,7 @@ export const fetchTransactionsSchema = {
       startDate: { type: 'string' },
       endDate: { type: 'string' },
       page: { type: 'integer', default: 1 },
-      perPage: { type: 'integer', default: 20 },
+      perPage: { type: 'integer', default: 20, minimum: 1, maximum: 100 },
     },
   },
 
