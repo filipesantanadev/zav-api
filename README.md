@@ -6,7 +6,7 @@
 ![Node](https://img.shields.io/badge/node-v22-brightgreen)
 ![TypeScript](https://img.shields.io/badge/typescript-6.x-blue)
 ![License](https://img.shields.io/badge/license-ISC-lightgrey)
-[![Coverage](https://codecov.io/gh/filipesantanadev/zap-api/graph/badge.svg)](https://codecov.io/gh/filipesantanadev/zap-api)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/filipesantanadev/zap-api/main/coverage-badge.json)](https://github.com/filipesantanadev/zap-api/blob/main/coverage-badge.json)
 [![Deploy](https://img.shields.io/badge/deploy-Render-46E3B7?logo=render)](https://zap-api-uru0.onrender.com)
 [![Swagger](https://img.shields.io/badge/docs-Swagger-85EA2D?logo=swagger)](https://zap-api-uru0.onrender.com/docs)
 
@@ -297,7 +297,7 @@ O relatório de cobertura é gerado com `npm run test:coverage` e mede exclusiva
 | Functions  | 100%      |
 | Lines      | 100%      |
 
-O relatório HTML completo é gerado em `coverage/index.html`. O badge acima reflecte o relatório publicado automaticamente pelo CI via [Codecov](https://codecov.io/gh/filipesantanadev/zap-api).
+O relatório HTML completo é gerado localmente em `coverage/index.html` com `npm run test:coverage`. O badge acima é actualizado automaticamente pelo CI a cada push para `main`, sem dependência de serviços externos.
 
 ### Auditoria de dependências
 

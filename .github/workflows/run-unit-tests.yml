@@ -7,6 +7,9 @@ on:
       - develop
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   run-unit-tests:
     name: Run Unit Tests
@@ -28,8 +31,24 @@ jobs:
       - name: Executar testes com cobertura
         run: npm run test:coverage
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage/lcov.info
-          fail_ci_if_error: false
+      - name: Gerar coverage-badge.json
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          COVERAGE=$(node -e "
+            const s = JSON.parse(require('fs').readFileSync('./coverage/coverage-summary.json'));
+            console.log(Math.round(s.total.lines.pct));
+          ")
+          if [ "$COVERAGE" -ge 90 ]; then COLOR="brightgreen"
+          elif [ "$COVERAGE" -ge 80 ]; then COLOR="green"
+          elif [ "$COVERAGE" -ge 70 ]; then COLOR="yellow"
+          else COLOR="red"; fi
+          printf '{"schemaVersion":1,"label":"coverage","message":"%s%%","color":"%s"}\n' "$COVERAGE" "$COLOR" > coverage-badge.json
+
+      - name: Commit e push do badge
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add coverage-badge.json
+          git diff --staged --quiet || git commit -m "chore: update coverage badge [skip ci]"
+          git push
