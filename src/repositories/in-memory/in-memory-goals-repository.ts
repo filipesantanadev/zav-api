@@ -22,6 +22,12 @@ export class InMemoryGoalsRepository implements GoalsRepository {
     return goal
   }
 
+  async hasActiveGoalsByCategory(categoryId: string) {
+    return this.items.some(
+      (item) => item.categoryId === categoryId && item.status === 'IN_PROGRESS',
+    )
+  }
+
   async findManyByUserId(filters: FetchGoalsFilters) {
     const goals = this.items.filter((item) => item.userId === filters.userId)
 

@@ -36,6 +36,13 @@ export class PrismaGoalsRepository implements GoalsRepository {
     return this.toGoal(goal)
   }
 
+  async hasActiveGoalsByCategory(categoryId: string) {
+    const count = await prisma.goal.count({
+      where: { categoryId, status: 'IN_PROGRESS' },
+    })
+    return count > 0
+  }
+
   async findManyByUserId(filters: FetchGoalsFilters) {
     const where = { userId: filters.userId }
 

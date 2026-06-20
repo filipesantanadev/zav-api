@@ -51,6 +51,7 @@ export interface UpdateGoalInput {
 export interface GoalsRepository {
   findById(id: string): Promise<Goal | null>
   findManyByUserId(filters: FetchGoalsFilters): Promise<FetchGoalsResponse>
+  hasActiveGoalsByCategory(categoryId: string): Promise<boolean>
   updateProgress(id: string, data: UpdateGoalProgressInput): Promise<Goal>
   updateStatus(id: string, status: GoalStatus): Promise<Goal>
   update(id: string, data: UpdateGoalInput): Promise<Goal>

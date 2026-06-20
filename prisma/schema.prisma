@@ -78,7 +78,7 @@ model Goal {
   updatedAt     DateTime   @updatedAt @map("updated_at")
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([userId, status])

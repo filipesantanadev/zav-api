@@ -95,5 +95,10 @@ export const deleteCategorySchema = {
       type: 'object',
       properties: { message: { type: 'string' } },
     },
+    409: {
+      description: 'Categoria possui metas ativas vinculadas',
+      type: 'object',
+      properties: { message: { type: 'string' } },
+    },
   },
 }
