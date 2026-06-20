@@ -16,10 +16,24 @@ export class CacheService {
   }
 
   async deleteByPattern(pattern: string): Promise<void> {
-    const keys = await redis.keys(pattern)
-    if (keys.length > 0) {
-      await redis.del(...keys)
-    }
+    const pipeline = redis.pipeline()
+    let cursor = '0'
+
+    do {
+      const [nextCursor, keys] = await redis.scan(
+        cursor,
+        'MATCH',
+        pattern,
+        'COUNT',
+        100,
+      )
+      cursor = nextCursor
+      if (keys.length > 0) {
+        pipeline.del(...keys)
+      }
+    } while (cursor !== '0')
+
+    await pipeline.exec()
   }
 }
 

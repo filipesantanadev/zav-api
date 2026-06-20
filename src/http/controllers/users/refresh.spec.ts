@@ -40,9 +40,7 @@ describe('Refresh Token (e2e)', () => {
   })
 
   it('should not be able to refresh a token without cookie', async () => {
-    const response = await request(app.server)
-      .patch('/token/refresh')
-      .send()
+    const response = await request(app.server).patch('/token/refresh').send()
 
     expect(response.statusCode).toEqual(401)
   })

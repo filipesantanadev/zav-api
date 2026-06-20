@@ -234,7 +234,9 @@ describe('Update Transaction Use Case', () => {
     })
 
     expect(cacheService.deleteByPattern).toHaveBeenCalledOnce()
-    expect(cacheService.deleteByPattern).toHaveBeenCalledWith('dashboard:user-1:*')
+    expect(cacheService.deleteByPattern).toHaveBeenCalledWith(
+      'dashboard:user-1:*',
+    )
   })
 
   it('should not invalidate cache when update fails', async () => {
@@ -258,7 +260,9 @@ describe('Update Transaction Use Case', () => {
       userId: 'user-1',
     })
 
-    vi.mocked(cacheService.deleteByPattern).mockRejectedValueOnce(new Error('Redis unavailable'))
+    vi.mocked(cacheService.deleteByPattern).mockRejectedValueOnce(
+      new Error('Redis unavailable'),
+    )
 
     const { transaction: updated } = await sut.execute({
       id: transaction.id,

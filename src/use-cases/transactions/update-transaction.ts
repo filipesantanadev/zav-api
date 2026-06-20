@@ -67,7 +67,9 @@ export class UpdateTransactionUseCase {
     })
 
     try {
-      await this.cacheService.deleteByPattern(`dashboard:${transaction.userId}:*`)
+      await this.cacheService.deleteByPattern(
+        `dashboard:${transaction.userId}:*`,
+      )
     } catch {
       // cache invalidation is best-effort; a Redis failure must not abort a successful write
     }

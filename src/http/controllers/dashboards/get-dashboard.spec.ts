@@ -14,7 +14,10 @@ describe('Get Dashboard (e2e)', () => {
   })
 
   it('should reflect updated data after creating a transaction (cache invalidation)', async () => {
-    const { token } = await createAndAuthenticateUser(app, 'cache-create@example.com')
+    const { token } = await createAndAuthenticateUser(
+      app,
+      'cache-create@example.com',
+    )
 
     const firstDashboard = await request(app.server)
       .get('/dashboard')
@@ -42,7 +45,10 @@ describe('Get Dashboard (e2e)', () => {
   })
 
   it('should reflect updated data after updating a transaction (cache invalidation)', async () => {
-    const { token } = await createAndAuthenticateUser(app, 'cache-update@example.com')
+    const { token } = await createAndAuthenticateUser(
+      app,
+      'cache-update@example.com',
+    )
 
     const created = await request(app.server)
       .post('/transactions')
@@ -77,7 +83,10 @@ describe('Get Dashboard (e2e)', () => {
   })
 
   it('should reflect updated data after deleting a transaction (cache invalidation)', async () => {
-    const { token } = await createAndAuthenticateUser(app, 'cache-delete@example.com')
+    const { token } = await createAndAuthenticateUser(
+      app,
+      'cache-delete@example.com',
+    )
 
     const created = await request(app.server)
       .post('/transactions')

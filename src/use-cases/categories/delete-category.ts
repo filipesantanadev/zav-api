@@ -25,7 +25,8 @@ export class DeleteCategoryUseCase {
       throw new ResourceNotFoundError()
     }
 
-    const hasActiveGoals = await this.goalsRepository.hasActiveGoalsByCategory(id)
+    const hasActiveGoals =
+      await this.goalsRepository.hasActiveGoalsByCategory(id)
 
     if (hasActiveGoals) {
       throw new CategoryHasActiveGoalsError()

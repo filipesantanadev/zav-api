@@ -79,7 +79,9 @@ describe('Delete Transaction Use Case', () => {
     })
 
     expect(cacheService.deleteByPattern).toHaveBeenCalledOnce()
-    expect(cacheService.deleteByPattern).toHaveBeenCalledWith('dashboard:user-1:*')
+    expect(cacheService.deleteByPattern).toHaveBeenCalledWith(
+      'dashboard:user-1:*',
+    )
   })
 
   it('should not invalidate cache when deletion fails', async () => {
@@ -103,7 +105,9 @@ describe('Delete Transaction Use Case', () => {
       categoryId: 'category-1',
     })
 
-    vi.mocked(cacheService.deleteByPattern).mockRejectedValueOnce(new Error('Redis unavailable'))
+    vi.mocked(cacheService.deleteByPattern).mockRejectedValueOnce(
+      new Error('Redis unavailable'),
+    )
 
     await sut.execute({ id: transaction.id, userId: 'user-1' })
 

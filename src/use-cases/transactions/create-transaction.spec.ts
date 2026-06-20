@@ -138,7 +138,9 @@ describe('Create Transaction Use Case', () => {
     })
 
     expect(cacheService.deleteByPattern).toHaveBeenCalledOnce()
-    expect(cacheService.deleteByPattern).toHaveBeenCalledWith('dashboard:user-1:*')
+    expect(cacheService.deleteByPattern).toHaveBeenCalledWith(
+      'dashboard:user-1:*',
+    )
   })
 
   it('should not invalidate cache when transaction creation fails', async () => {
@@ -170,7 +172,9 @@ describe('Create Transaction Use Case', () => {
   })
 
   it('should succeed even when cache invalidation throws', async () => {
-    vi.mocked(cacheService.deleteByPattern).mockRejectedValueOnce(new Error('Redis unavailable'))
+    vi.mocked(cacheService.deleteByPattern).mockRejectedValueOnce(
+      new Error('Redis unavailable'),
+    )
 
     const { transaction } = await sut.execute({
       title: 'Salary',

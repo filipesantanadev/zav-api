@@ -5,7 +5,10 @@ import { DeleteCategoryUseCase } from '@/use-cases/categories/delete-category'
 export function makeDeleteCategoryUseCase() {
   const categoriesRepository = new PrismaCategoriesRepository()
   const goalsRepository = new PrismaGoalsRepository()
-  const useCase = new DeleteCategoryUseCase(categoriesRepository, goalsRepository)
+  const useCase = new DeleteCategoryUseCase(
+    categoriesRepository,
+    goalsRepository,
+  )
 
   return useCase
 }
