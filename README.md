@@ -266,6 +266,22 @@ Os testes unitários usam **repositórios in-memory** que implementam as mesmas 
 
 Os testes e2e criam um schema PostgreSQL isolado por suite (via `vitest-environment-prisma`) e rodam migrations completas antes de cada execução.
 
+### Auditoria de dependências
+
+```bash
+npm audit
+```
+
+O `npm audit` reporta vulnerabilidades exclusivamente em **dependências de desenvolvimento** (ferramentas de build e lint). Nenhuma dependência de runtime é afetada:
+
+| Pacote vulnerável | Origem | Categoria |
+|---|---|---|
+| `minimatch` | `@rocketseat/eslint-config` | ESLint (não vai a produção) |
+| `esbuild` | `tsup` | Bundler de build (não vai a produção) |
+| `@hono/node-server` | `prisma` CLI | CLI de migrations (não vai a produção) |
+
+Os fixes disponíveis exigem breaking changes (downgrade do Prisma ou troca do preset do ESLint), portanto foram mantidos intencionalmente. As dependências de runtime — `fastify`, `@prisma/client`, `ioredis`, `zod`, `bcryptjs` — estão todas sem vulnerabilidades conhecidas.
+
 ---
 
 ## 📁 Estrutura de Pastas
