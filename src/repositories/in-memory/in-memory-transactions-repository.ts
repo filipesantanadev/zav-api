@@ -8,6 +8,7 @@ import type {
   ExpenseByCategory,
 } from '../transactions-repository'
 import { randomUUID } from 'node:crypto'
+import { largestRemainder } from '@/utils/largest-remainder'
 
 export class InMemoryTransactionsRepository implements TransactionsRepository {
   public items: Transaction[] = []
@@ -114,12 +115,17 @@ export class InMemoryTransactionsRepository implements TransactionsRepository {
       0,
     )
 
-    return Object.values(grouped).map((item) => ({
+    const items = Object.values(grouped)
+    const percentages = largestRemainder(
+      items.map((item) => item.total),
+      totalExpenses,
+    )
+
+    return items.map((item, i) => ({
       categoryId: item.categoryId,
-      categoryName: null, // ← in-memory não tem join com categories
+      categoryName: null, // in-memory has no category join
       total: item.total,
-      percentage:
-        totalExpenses > 0 ? Math.round((item.total / totalExpenses) * 100) : 0,
+      percentage: percentages[i]!,
     }))
   }
 

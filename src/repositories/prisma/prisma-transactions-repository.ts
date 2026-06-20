@@ -8,6 +8,7 @@ import type {
   UpdateTransactionInput,
 } from '../transactions-repository'
 import { Prisma } from '@prisma/client'
+import { largestRemainder } from '@/utils/largest-remainder'
 
 export class PrismaTransactionsRepository implements TransactionsRepository {
   // ← converte Decimal → number em todos os métodos
@@ -97,47 +98,40 @@ export class PrismaTransactionsRepository implements TransactionsRepository {
   }
 
   async getExpensesByCategory(userId: string, startDate: Date, endDate: Date) {
-    const result = await prisma.transaction.groupBy({
-      by: ['categoryId'],
-      where: {
-        userId,
-        type: 'EXPENSE',
-        date: { gte: startDate, lte: endDate },
-      },
-      _sum: { amount: true },
-      orderBy: { _sum: { amount: 'desc' } },
-    })
+    interface RawRow {
+      categoryId: string | null
+      categoryName: string | null
+      total: number
+    }
 
-    const totalExpenses = result.reduce(
-      (acc, item) => acc + (item._sum.amount?.toNumber() ?? 0),
-      0,
+    // Single query: JOIN eliminates the separate category name lookup
+    const rows = await prisma.$queryRaw<RawRow[]>`
+      SELECT
+        t.category_id         AS "categoryId",
+        c.name                AS "categoryName",
+        SUM(t.amount)::float8 AS total
+      FROM transactions t
+      LEFT JOIN categories c ON c.id = t.category_id
+      WHERE t.user_id  = ${userId}
+        AND t.type::text = 'EXPENSE'
+        AND t.date >= ${startDate}
+        AND t.date <= ${endDate}
+      GROUP BY t.category_id, c.name
+      ORDER BY total DESC
+    `
+
+    const totalExpenses = rows.reduce((acc, row) => acc + row.total, 0)
+    const percentages = largestRemainder(
+      rows.map((r) => r.total),
+      totalExpenses,
     )
 
-    // busca os nomes das categorias
-    const categoryIds = result
-      .map((item) => item.categoryId)
-      .filter((id): id is string => id !== null)
-
-    const categories = await prisma.category.findMany({
-      where: { id: { in: categoryIds } },
-      select: { id: true, name: true },
-    })
-
-    const categoryMap = new Map(categories.map((c) => [c.id, c.name]))
-
-    return result.map((item) => {
-      const total = item._sum.amount?.toNumber() ?? 0
-
-      return {
-        categoryId: item.categoryId,
-        categoryName: item.categoryId
-          ? (categoryMap.get(item.categoryId) ?? null)
-          : null,
-        total,
-        percentage:
-          totalExpenses > 0 ? Math.round((total / totalExpenses) * 100) : 0,
-      }
-    })
+    return rows.map((row, i) => ({
+      categoryId: row.categoryId,
+      categoryName: row.categoryName,
+      total: row.total,
+      percentage: percentages[i]!,
+    }))
   }
 
   async create(data: CreateTransactionInput) {

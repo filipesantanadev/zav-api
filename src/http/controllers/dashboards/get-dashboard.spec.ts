@@ -119,6 +119,72 @@ describe('Get Dashboard (e2e)', () => {
     expect(secondDashboard.body.summary.totalIncome).toEqual(0)
   })
 
+  it('should return expenses grouped by category with correct names and percentages', async () => {
+    const { token } = await createAndAuthenticateUser(
+      app,
+      'dashboard-cat@example.com',
+    )
+
+    const food = await request(app.server)
+      .post('/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Food', color: '#FF5733', icon: 'food' })
+
+    const transport = await request(app.server)
+      .post('/categories')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Transport', color: '#3399FF', icon: 'car' })
+
+    const today = new Date().toISOString().split('T')[0]
+
+    await request(app.server)
+      .post('/transactions')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        title: 'Groceries',
+        amount: 750,
+        type: 'EXPENSE',
+        date: today,
+        categoryId: food.body.category.id,
+      })
+
+    await request(app.server)
+      .post('/transactions')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        title: 'Bus pass',
+        amount: 250,
+        type: 'EXPENSE',
+        date: today,
+        categoryId: transport.body.category.id,
+      })
+
+    const dashboard = await request(app.server)
+      .get('/dashboard')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(dashboard.statusCode).toEqual(200)
+
+    const { expensesByCategory } = dashboard.body
+    expect(expensesByCategory).toHaveLength(2)
+
+    const foodEntry = expensesByCategory.find(
+      (e: { categoryName: string }) => e.categoryName === 'Food',
+    )
+    const transportEntry = expensesByCategory.find(
+      (e: { categoryName: string }) => e.categoryName === 'Transport',
+    )
+
+    expect(foodEntry).toMatchObject({ total: 750, percentage: 75 })
+    expect(transportEntry).toMatchObject({ total: 250, percentage: 25 })
+
+    const pctSum = expensesByCategory.reduce(
+      (acc: number, e: { percentage: number }) => acc + e.percentage,
+      0,
+    )
+    expect(pctSum).toEqual(100)
+  })
+
   it('should not be able to get dashboard without a token', async () => {
     const response = await request(app.server).get('/dashboard')
 

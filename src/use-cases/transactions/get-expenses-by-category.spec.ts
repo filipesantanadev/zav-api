@@ -43,7 +43,7 @@ describe('Get Expenses By Category Use Case', () => {
   })
 
   it('should handle transactions without category', async () => {
-    const created = await transactionsRepository.create({
+    await transactionsRepository.create({
       title: 'Despesa sem categoria',
       amount: 30000,
       type: 'EXPENSE',
@@ -222,5 +222,52 @@ describe('Get Expenses By Category Use Case', () => {
     })
 
     expect(expensesByCategory).toHaveLength(0)
+  })
+
+  it('should always sum percentages to 100 (largest-remainder rounding)', async () => {
+    // 333 + 333 + 334 = 1000; naive Math.round gives 33+33+33=99
+    await transactionsRepository.create({
+      title: 'A',
+      amount: 333,
+      type: 'EXPENSE',
+      date: dayjs().toDate(),
+      userId: 'user-1',
+      categoryId: 'category-1',
+    })
+
+    await transactionsRepository.create({
+      title: 'B',
+      amount: 333,
+      type: 'EXPENSE',
+      date: dayjs().toDate(),
+      userId: 'user-1',
+      categoryId: 'category-2',
+    })
+
+    await transactionsRepository.create({
+      title: 'C',
+      amount: 334,
+      type: 'EXPENSE',
+      date: dayjs().toDate(),
+      userId: 'user-1',
+      categoryId: 'category-3',
+    })
+
+    const { expensesByCategory } = await sut.execute({
+      userId: 'user-1',
+      month: dayjs().month() + 1,
+      year: dayjs().year(),
+    })
+
+    const sum = expensesByCategory.reduce((acc, e) => acc + e.percentage, 0)
+    expect(sum).toEqual(100)
+
+    // category-3 has the largest fractional part (33.4%) so it receives the +1
+    const a = expensesByCategory.find((e) => e.categoryId === 'category-1')
+    const b = expensesByCategory.find((e) => e.categoryId === 'category-2')
+    const c = expensesByCategory.find((e) => e.categoryId === 'category-3')
+    expect(a?.percentage).toEqual(33)
+    expect(b?.percentage).toEqual(33)
+    expect(c?.percentage).toEqual(34)
   })
 })
