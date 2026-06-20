@@ -13,8 +13,9 @@ import { dashboardRoutes } from './http/controllers/dashboards/routes'
 import { swaggerPlugin } from './http/plugins/swagger'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
+import { logger } from './lib/logger'
 
-export const app = fastify()
+export const app = fastify({ logger })
 
 const { swagger, swaggerUi } = swaggerPlugin()
 
@@ -57,11 +58,7 @@ app.setErrorHandler((error, _, reply) => {
     return reply.status(error.statusCode).send({ message: error.message })
   }
 
-  if (env.NODE_ENV !== 'production') {
-    console.error(error)
-  } else {
-    // TODO: here we should log to an external tool like DataDog, NewRelic, Sentry, etc.
-  }
+  app.log.error(error)
 
   return reply.status(500).send({ message: 'Internal server error.' })
 })

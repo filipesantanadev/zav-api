@@ -110,6 +110,13 @@ describe('Get Dashboard (e2e)', () => {
     expect(secondDashboard.body.summary.totalIncome).toEqual(0)
   })
 
+  it('should not be able to get dashboard without a token', async () => {
+    const response = await request(app.server).get('/dashboard')
+
+    expect(response.statusCode).toEqual(401)
+    expect(response.body).toEqual({ message: 'Unauthorized.' })
+  })
+
   it('should be able to get dashboard', async () => {
     const { token } = await createAndAuthenticateUser(app)
 

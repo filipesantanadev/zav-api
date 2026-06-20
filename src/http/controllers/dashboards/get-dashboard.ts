@@ -31,7 +31,7 @@ export async function getDashboard(
       return reply.status(200).send(cached)
     }
   } catch (error) {
-    console.error('Cache read error:', error)
+    request.log.error({ err: error }, 'Cache read error')
   }
 
   const [
@@ -56,7 +56,7 @@ export async function getDashboard(
   try {
     await cache.set(cacheKey, dashboardData, 300)
   } catch (error) {
-    console.error('Cache write error:', error)
+    request.log.error({ err: error }, 'Cache write error')
   }
 
   return reply.status(200).send(dashboardData)
