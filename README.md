@@ -6,6 +6,7 @@
 ![Node](https://img.shields.io/badge/node-v22-brightgreen)
 ![TypeScript](https://img.shields.io/badge/typescript-6.x-blue)
 ![License](https://img.shields.io/badge/license-ISC-lightgrey)
+[![Coverage](https://codecov.io/gh/filipesantanadev/zap-api/graph/badge.svg)](https://codecov.io/gh/filipesantanadev/zap-api)
 [![Deploy](https://img.shields.io/badge/deploy-Render-46E3B7?logo=render)](https://zap-api-uru0.onrender.com)
 [![Swagger](https://img.shields.io/badge/docs-Swagger-85EA2D?logo=swagger)](https://zap-api-uru0.onrender.com/docs)
 
@@ -284,6 +285,19 @@ npm run test:e2e
 Os testes unitários usam **repositórios in-memory** que implementam as mesmas interfaces do banco real, garantindo velocidade e isolamento total.
 
 Os testes e2e criam um schema PostgreSQL isolado por suite (via `vitest-environment-prisma`) e rodam migrations completas antes de cada execução.
+
+### Cobertura de testes
+
+O relatório de cobertura é gerado com `npm run test:coverage` e mede exclusivamente a lógica de negócio (`src/use-cases/`), excluindo factories e utilitários de teste. O threshold mínimo exigido é **80%** em statements, branches, functions e lines.
+
+| Métrica    | Cobertura |
+| ---------- | --------- |
+| Statements | 100%      |
+| Branches   | 100%      |
+| Functions  | 100%      |
+| Lines      | 100%      |
+
+O relatório HTML completo é gerado em `coverage/index.html`. O badge acima reflecte o relatório publicado automaticamente pelo CI via [Codecov](https://codecov.io/gh/filipesantanadev/zap-api).
 
 ### Auditoria de dependências
 
