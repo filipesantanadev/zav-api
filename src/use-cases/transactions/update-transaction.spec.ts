@@ -1,18 +1,21 @@
-import { expect, describe, it, beforeEach } from 'vitest'
+import { expect, describe, it, beforeEach, vi } from 'vitest'
 import { InMemoryTransactionsRepository } from '@/repositories/in-memory/in-memory-transactions-repository'
 import { UpdateTransactionUseCase } from './update-transaction'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 import { InvalidTransactionAmountError } from '../errors/invalid-transaction-amount-error'
 import dayjs from 'dayjs'
 import { FutureDateTransactionError } from '../errors/future-date-transaction-error'
+import type { CacheService } from '@/infra/cache/cache.service'
 
 let transactionsRepository: InMemoryTransactionsRepository
+let cacheService: CacheService
 let sut: UpdateTransactionUseCase
 
 describe('Update Transaction Use Case', () => {
   beforeEach(() => {
     transactionsRepository = new InMemoryTransactionsRepository()
-    sut = new UpdateTransactionUseCase(transactionsRepository)
+    cacheService = { deleteByPattern: vi.fn() } as unknown as CacheService
+    sut = new UpdateTransactionUseCase(transactionsRepository, cacheService)
   })
 
   it('should be able to update a transaction', async () => {
@@ -213,5 +216,56 @@ describe('Update Transaction Use Case', () => {
         date: dayjs().add(1, 'day').toDate(),
       }),
     ).rejects.toBeInstanceOf(FutureDateTransactionError)
+  })
+
+  it('should invalidate dashboard cache after updating a transaction', async () => {
+    const transaction = await transactionsRepository.create({
+      title: 'Salary',
+      amount: 5000,
+      type: 'INCOME',
+      date: new Date(),
+      userId: 'user-1',
+    })
+
+    await sut.execute({
+      id: transaction.id,
+      userId: 'user-1',
+      title: 'Updated Salary',
+    })
+
+    expect(cacheService.deleteByPattern).toHaveBeenCalledOnce()
+    expect(cacheService.deleteByPattern).toHaveBeenCalledWith('dashboard:user-1:*')
+  })
+
+  it('should not invalidate cache when update fails', async () => {
+    await expect(() =>
+      sut.execute({
+        id: 'non-existent-id',
+        userId: 'user-1',
+        title: 'New Title',
+      }),
+    ).rejects.toBeInstanceOf(ResourceNotFoundError)
+
+    expect(cacheService.deleteByPattern).not.toHaveBeenCalled()
+  })
+
+  it('should succeed even when cache invalidation throws', async () => {
+    const transaction = await transactionsRepository.create({
+      title: 'Salary',
+      amount: 5000,
+      type: 'INCOME',
+      date: new Date(),
+      userId: 'user-1',
+    })
+
+    vi.mocked(cacheService.deleteByPattern).mockRejectedValueOnce(new Error('Redis unavailable'))
+
+    const { transaction: updated } = await sut.execute({
+      id: transaction.id,
+      userId: 'user-1',
+      title: 'Updated Salary',
+    })
+
+    expect(updated.title).toEqual('Updated Salary')
   })
 })

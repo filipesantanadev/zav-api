@@ -5,6 +5,7 @@ import type {
   Transaction,
   TransactionsRepository,
 } from '@/repositories/transactions-repository'
+import type { CacheService } from '@/infra/cache/cache.service'
 
 interface CreateTransactionUseCaseRequest {
   title: string
@@ -21,7 +22,10 @@ interface CreateTransactionUseCaseResponse {
 }
 
 export class CreateTransactionUseCase {
-  constructor(private transactionsRepository: TransactionsRepository) {}
+  constructor(
+    private transactionsRepository: TransactionsRepository,
+    private cacheService: CacheService,
+  ) {}
 
   async execute({
     title,
@@ -49,6 +53,12 @@ export class CreateTransactionUseCase {
       userId,
       categoryId: categoryId ?? null,
     })
+
+    try {
+      await this.cacheService.deleteByPattern(`dashboard:${userId}:*`)
+    } catch {
+      // cache invalidation is best-effort; a Redis failure must not abort a successful write
+    }
 
     return {
       transaction,

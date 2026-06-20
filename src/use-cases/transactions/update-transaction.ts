@@ -6,6 +6,7 @@ import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 import { InvalidTransactionAmountError } from '../errors/invalid-transaction-amount-error'
 import { FutureDateTransactionError } from '../errors/future-date-transaction-error'
 import dayjs from 'dayjs'
+import type { CacheService } from '@/infra/cache/cache.service'
 
 interface UpdateTransactionUseCaseRequest {
   id: string
@@ -23,7 +24,10 @@ interface UpdateTransactionUseCaseResponse {
 }
 
 export class UpdateTransactionUseCase {
-  constructor(private transactionsRepository: TransactionsRepository) {}
+  constructor(
+    private transactionsRepository: TransactionsRepository,
+    private cacheService: CacheService,
+  ) {}
 
   async execute({
     id,
@@ -61,6 +65,12 @@ export class UpdateTransactionUseCase {
       ...(notes !== undefined && { notes }),
       ...(categoryId !== undefined && { categoryId }),
     })
+
+    try {
+      await this.cacheService.deleteByPattern(`dashboard:${transaction.userId}:*`)
+    } catch {
+      // cache invalidation is best-effort; a Redis failure must not abort a successful write
+    }
 
     return {
       transaction: updatedTransaction,

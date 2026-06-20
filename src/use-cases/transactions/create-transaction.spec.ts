@@ -1,17 +1,20 @@
-import { expect, describe, it, beforeEach } from 'vitest'
+import { expect, describe, it, beforeEach, vi } from 'vitest'
 import { CreateTransactionUseCase } from './create-transaction'
 import { InMemoryTransactionsRepository } from '@/repositories/in-memory/in-memory-transactions-repository'
 import { InvalidTransactionAmountError } from '../errors/invalid-transaction-amount-error'
 import dayjs from 'dayjs'
 import { FutureDateTransactionError } from '../errors/future-date-transaction-error'
+import type { CacheService } from '@/infra/cache/cache.service'
 
 let transactionsRepository: InMemoryTransactionsRepository
+let cacheService: CacheService
 let sut: CreateTransactionUseCase
 
 describe('Create Transaction Use Case', () => {
   beforeEach(() => {
     transactionsRepository = new InMemoryTransactionsRepository()
-    sut = new CreateTransactionUseCase(transactionsRepository)
+    cacheService = { deleteByPattern: vi.fn() } as unknown as CacheService
+    sut = new CreateTransactionUseCase(transactionsRepository, cacheService)
   })
 
   it('should be able to create a transaction', async () => {
@@ -123,5 +126,61 @@ describe('Create Transaction Use Case', () => {
         userId: 'user-1',
       }),
     ).rejects.toBeInstanceOf(FutureDateTransactionError)
+  })
+
+  it('should invalidate dashboard cache after creating a transaction', async () => {
+    await sut.execute({
+      title: 'Salary',
+      amount: 5000,
+      type: 'INCOME',
+      date: new Date(),
+      userId: 'user-1',
+    })
+
+    expect(cacheService.deleteByPattern).toHaveBeenCalledOnce()
+    expect(cacheService.deleteByPattern).toHaveBeenCalledWith('dashboard:user-1:*')
+  })
+
+  it('should not invalidate cache when transaction creation fails', async () => {
+    await expect(() =>
+      sut.execute({
+        title: 'Salary',
+        amount: -100,
+        type: 'INCOME',
+        date: new Date(),
+        userId: 'user-1',
+      }),
+    ).rejects.toBeInstanceOf(InvalidTransactionAmountError)
+
+    expect(cacheService.deleteByPattern).not.toHaveBeenCalled()
+  })
+
+  it('should not invalidate cache when creation fails due to future date', async () => {
+    await expect(() =>
+      sut.execute({
+        title: 'Salary',
+        amount: 5000,
+        type: 'INCOME',
+        date: dayjs().add(1, 'day').toDate(),
+        userId: 'user-1',
+      }),
+    ).rejects.toBeInstanceOf(FutureDateTransactionError)
+
+    expect(cacheService.deleteByPattern).not.toHaveBeenCalled()
+  })
+
+  it('should succeed even when cache invalidation throws', async () => {
+    vi.mocked(cacheService.deleteByPattern).mockRejectedValueOnce(new Error('Redis unavailable'))
+
+    const { transaction } = await sut.execute({
+      title: 'Salary',
+      amount: 5000,
+      type: 'INCOME',
+      date: new Date(),
+      userId: 'user-1',
+    })
+
+    expect(transaction.id).toEqual(expect.any(String))
+    expect(transactionsRepository.items).toHaveLength(1)
   })
 })

@@ -13,6 +13,103 @@ describe('Get Dashboard (e2e)', () => {
     await app.close()
   })
 
+  it('should reflect updated data after creating a transaction (cache invalidation)', async () => {
+    const { token } = await createAndAuthenticateUser(app, 'cache-create@example.com')
+
+    const firstDashboard = await request(app.server)
+      .get('/dashboard')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(firstDashboard.statusCode).toEqual(200)
+    expect(firstDashboard.body.summary.totalIncome).toEqual(0)
+
+    await request(app.server)
+      .post('/transactions')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        title: 'New Income',
+        amount: 3000,
+        type: 'INCOME',
+        date: new Date().toISOString().split('T')[0],
+      })
+
+    const secondDashboard = await request(app.server)
+      .get('/dashboard')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(secondDashboard.statusCode).toEqual(200)
+    expect(secondDashboard.body.summary.totalIncome).toEqual(3000)
+  })
+
+  it('should reflect updated data after updating a transaction (cache invalidation)', async () => {
+    const { token } = await createAndAuthenticateUser(app, 'cache-update@example.com')
+
+    const created = await request(app.server)
+      .post('/transactions')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        title: 'Salary',
+        amount: 5000,
+        type: 'INCOME',
+        date: new Date().toISOString().split('T')[0],
+      })
+
+    const transactionId = created.body.transaction.id
+
+    const firstDashboard = await request(app.server)
+      .get('/dashboard')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(firstDashboard.statusCode).toEqual(200)
+    expect(firstDashboard.body.summary.totalIncome).toEqual(5000)
+
+    await request(app.server)
+      .patch(`/transactions/${transactionId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ amount: 8000 })
+
+    const secondDashboard = await request(app.server)
+      .get('/dashboard')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(secondDashboard.statusCode).toEqual(200)
+    expect(secondDashboard.body.summary.totalIncome).toEqual(8000)
+  })
+
+  it('should reflect updated data after deleting a transaction (cache invalidation)', async () => {
+    const { token } = await createAndAuthenticateUser(app, 'cache-delete@example.com')
+
+    const created = await request(app.server)
+      .post('/transactions')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        title: 'Salary',
+        amount: 5000,
+        type: 'INCOME',
+        date: new Date().toISOString().split('T')[0],
+      })
+
+    const transactionId = created.body.transaction.id
+
+    const firstDashboard = await request(app.server)
+      .get('/dashboard')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(firstDashboard.statusCode).toEqual(200)
+    expect(firstDashboard.body.summary.totalIncome).toEqual(5000)
+
+    await request(app.server)
+      .delete(`/transactions/${transactionId}`)
+      .set('Authorization', `Bearer ${token}`)
+
+    const secondDashboard = await request(app.server)
+      .get('/dashboard')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(secondDashboard.statusCode).toEqual(200)
+    expect(secondDashboard.body.summary.totalIncome).toEqual(0)
+  })
+
   it('should be able to get dashboard', async () => {
     const { token } = await createAndAuthenticateUser(app)
 
