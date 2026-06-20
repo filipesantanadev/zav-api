@@ -55,7 +55,8 @@ export async function authenticate(
       })
   } catch (err) {
     if (err instanceof InvalidCredentialsError) {
-      return reply.status(400).send({ message: err.message })
+      request.log.warn({ email }, 'Authentication failed: invalid credentials')
+      return reply.status(401).send({ message: err.message })
     }
 
     throw err

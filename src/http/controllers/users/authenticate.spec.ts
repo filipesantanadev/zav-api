@@ -44,7 +44,7 @@ describe('Authenticate (e2e)', () => {
       password: 'wrong-password',
     })
 
-    expect(response.statusCode).toEqual(400)
+    expect(response.statusCode).toEqual(401)
     expect(response.body).toEqual({
       message: expect.any(String),
     })
@@ -56,7 +56,7 @@ describe('Authenticate (e2e)', () => {
       password: 'password0123',
     })
 
-    expect(response.statusCode).toEqual(400)
+    expect(response.statusCode).toEqual(401)
     expect(response.body).toEqual({
       message: expect.any(String),
     })
