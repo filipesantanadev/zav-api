@@ -6,6 +6,7 @@ const envSchema = z.object({
     .enum(['development', 'test', 'production'])
     .default('development'),
   APP_URL: z.string(),
+  CORS_ORIGIN: z.string().default('http://localhost:5173'),
   JWT_SECRET: z.string(),
   PORT: z.coerce.number().default(3333),
   REDIS_HOST: z.string().optional(),

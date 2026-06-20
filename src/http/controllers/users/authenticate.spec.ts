@@ -27,5 +27,38 @@ describe('Authenticate (e2e)', () => {
     expect(response.body).toEqual({
       token: expect.any(String),
     })
+    const [cookie] = response.get('Set-Cookie')!
+    expect(cookie).toContain('refreshToken=')
+    expect(cookie).toContain('Max-Age=604800')
+  })
+
+  it('should not be able to authenticate with wrong password', async () => {
+    await request(app.server).post('/users').send({
+      name: 'Jane Doe',
+      email: 'janedoe@example.com',
+      password: 'password0123',
+    })
+
+    const response = await request(app.server).post('/sessions').send({
+      email: 'janedoe@example.com',
+      password: 'wrong-password',
+    })
+
+    expect(response.statusCode).toEqual(400)
+    expect(response.body).toEqual({
+      message: expect.any(String),
+    })
+  })
+
+  it('should not be able to authenticate with wrong email', async () => {
+    const response = await request(app.server).post('/sessions').send({
+      email: 'nonexistent@example.com',
+      password: 'password0123',
+    })
+
+    expect(response.statusCode).toEqual(400)
+    expect(response.body).toEqual({
+      message: expect.any(String),
+    })
   })
 })

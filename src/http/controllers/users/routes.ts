@@ -31,7 +31,14 @@ export async function usersRoutes(app: FastifyInstance) {
     authenticate,
   )
 
-  app.patch('/token/refresh', { schema: refreshTokenSchema }, refresh)
+  app.patch(
+    '/token/refresh',
+    {
+      schema: refreshTokenSchema,
+      config: { rateLimit: { max: 10, timeWindow: '15 minutes' } },
+    },
+    refresh,
+  )
 
   app.get(
     '/me',

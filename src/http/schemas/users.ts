@@ -149,4 +149,4 @@ export const refreshTokenSchema = {
       properties: { message: { type: 'string' } },
     },
   },
-}
+} as const

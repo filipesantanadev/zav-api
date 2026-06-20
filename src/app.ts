@@ -3,6 +3,7 @@ import { ZodError } from 'zod'
 import { env } from './env'
 import fastifyJwt from '@fastify/jwt'
 import fastifyCookie from '@fastify/cookie'
+import fastifyCors from '@fastify/cors'
 import fastifyRateLimit from '@fastify/rate-limit'
 import { usersRoutes } from './http/controllers/users/routes'
 import { transactionsRoutes } from './http/controllers/transactions/routes'
@@ -19,6 +20,10 @@ const { swagger, swaggerUi } = swaggerPlugin()
 
 app.register(fastifySwagger, swagger)
 app.register(fastifySwaggerUi, swaggerUi)
+app.register(fastifyCors, {
+  origin: env.CORS_ORIGIN,
+  credentials: true,
+})
 app.register(fastifyRateLimit, {
   global: false,
 })

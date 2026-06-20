@@ -28,6 +28,7 @@ export async function refresh(request: FastifyRequest, reply: FastifyReply) {
       secure: true,
       sameSite: true,
       httpOnly: true,
+      maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
     })
     .status(200)
     .send({

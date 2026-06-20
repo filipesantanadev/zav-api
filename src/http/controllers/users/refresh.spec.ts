@@ -34,8 +34,16 @@ describe('Refresh Token (e2e)', () => {
     expect(response.body).toEqual({
       token: expect.any(String),
     })
-    expect(response.get('Set-Cookie')).toEqual([
-      expect.stringContaining('refreshToken='),
-    ])
+    const [cookie] = response.get('Set-Cookie')!
+    expect(cookie).toContain('refreshToken=')
+    expect(cookie).toContain('Max-Age=604800')
+  })
+
+  it('should not be able to refresh a token without cookie', async () => {
+    const response = await request(app.server)
+      .patch('/token/refresh')
+      .send()
+
+    expect(response.statusCode).toEqual(401)
   })
 })
