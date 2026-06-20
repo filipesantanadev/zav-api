@@ -15,7 +15,10 @@ export async function verifyJWT(request: FastifyRequest, reply: FastifyReply) {
   })
 
   if (!user) {
-    request.log.warn({ sub: request.user.sub }, 'JWT sub does not match any user')
+    request.log.warn(
+      { sub: request.user.sub },
+      'JWT sub does not match any user',
+    )
     return reply.status(401).send({ message: 'Unauthorized.' })
   }
 }

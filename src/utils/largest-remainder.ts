@@ -4,7 +4,10 @@
  * Math.floor to each item, then give the leftover points to the items with the
  * largest fractional parts.
  */
-export function largestRemainder(totals: number[], grandTotal: number): number[] {
+export function largestRemainder(
+  totals: number[],
+  grandTotal: number,
+): number[] {
   if (grandTotal === 0 || totals.length === 0) {
     return totals.map(() => 0)
   }
