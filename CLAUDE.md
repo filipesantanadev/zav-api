@@ -54,12 +54,13 @@ HTTP Controllers → Use Cases → Repository Interfaces ← Repository Implemen
 - `src/infra/cache/` — `CacheService` wraps ioredis. The exported `cache` singleton is used directly by use cases that need Redis.
 - `src/http/schemas/` — Plain OpenAPI JSON Schema objects for Swagger, one file per domain, always `as const`.
 - `src/lib/prisma.ts` — Single `PrismaClient` instance using `@prisma/adapter-pg` with explicit `schema` support (required for E2E test isolation).
+- `src/lib/logger.ts` — Pino logger config per `NODE_ENV`. Development uses `pino-pretty`; production emits raw JSON; test sets `level: 'silent'`. Passed directly to `fastify({ logger })`.
 
 ## Project Standards
 
 ### Node.js
 
-- Runtime: Node.js >= 22 (enforced in `package.json` `engines` field).
+- Runtime: Node.js >= 22 (enforced in `package.json` `engines` field; exact range is `>=22.14.0 <23`).
 - Project is pure ESM (`"type": "module"`). All imports use ESM syntax.
 - Use the `node:` prefix for built-in modules: `import { randomUUID } from 'node:crypto'`.
 
@@ -73,11 +74,22 @@ HTTP Controllers → Use Cases → Repository Interfaces ← Repository Implemen
 ### Fastify
 
 - App instance exported from `src/app.ts`; server started in `src/server.ts`.
-- Plugin registration order in `app.ts`: Swagger → JWT → Cookies → domain routes.
-- JWT expiry is 10 minutes; refresh token is delivered via `HttpOnly` cookie (`refreshToken`).
+- Plugin registration order in `app.ts`: Swagger → CORS → RateLimit → JWT → Cookies → domain routes.
+- JWT expiry is 10 minutes; refresh token is delivered via `HttpOnly` cookie (`refreshToken`) and expires in 7 days.
+- CORS origin is controlled by `CORS_ORIGIN` env var (default: `http://localhost:5173`).
+- Rate limiting is registered globally via `@fastify/rate-limit` with `global: false` — apply per-route as needed.
 - Use `app.addHook('onRequest', verifyJWT)` at the route-group level to protect all routes in a router. Use `{ onRequest: [verifyJWT] }` on individual routes only when mixed auth is needed within the same router.
 - Validate request body/query/params with Zod inside controllers using `.parse()`. Zod errors are caught globally in `app.setErrorHandler` and returned as `400` with formatted issues.
-- Error handling pattern in controllers: catch domain errors (e.g., `ResourceNotFoundError`), return the appropriate HTTP status; let unexpected errors bubble to the global handler.
+- Error handling pattern in controllers: catch domain errors (e.g., `ResourceNotFoundError`), return the appropriate HTTP status; let unexpected errors bubble to the global handler. The global handler logs 5xx errors with `app.log.error(error)`.
+
+### Logging
+
+- Pino is configured in `src/lib/logger.ts` and passed to Fastify at startup.
+- Sensitive fields are redacted via Pino `redact`: `req.headers.authorization`, `req.headers.cookie`, `req.body.password`.
+- DB credentials in error messages are scrubbed by a regex serializer on the `err` key.
+- Development: `pino-pretty` transport with colorized output (devDependency only).
+- Production: raw JSON at `warn` level (no transport).
+- Test: `level: 'silent'` — no output during test runs.
 
 ### Prisma
 
@@ -101,6 +113,7 @@ HTTP Controllers → Use Cases → Repository Interfaces ← Repository Implemen
 - Every protected endpoint schema must include `security: [{ bearerAuth: [] }]`.
 - Always define response schemas for success codes (200/201/204) and expected error codes (400/404). Use `type: 'null'` for empty responses (204).
 - Attach schemas in `routes.ts` via the `schema` option: `app.post('/foo', { schema: createFooSchema }, handler)`.
+- Swagger UI is available at `/docs` in all environments.
 
 ### Docker
 
@@ -127,14 +140,26 @@ HTTP Controllers → Use Cases → Repository Interfaces ← Repository Implemen
 ```env
 NODE_ENV=development
 APP_URL=http://localhost:3333
+CORS_ORIGIN=http://localhost:5173
 JWT_SECRET=your-secret-here
 PORT=3333
-DATABASE_URL=postgresql://docker:docker@localhost:5432/apizav
+DATABASE_URL=postgresql://docker:docker@localhost:5432/apizav?schema=public
 REDIS_HOST=localhost
 REDIS_PORT=6379
 ```
 
-`REDIS_HOST` is optional in development. `APP_URL` is used to set the Swagger server URL in production.
+`REDIS_HOST` is optional in development (server starts with `lazyConnect`). `APP_URL` is used to set the Swagger server URL in production. `CORS_ORIGIN` controls the allowed frontend origin.
+
+## Implemented Requirements
+
+All 34 requirements in `REQUISITOS.md` are implemented and marked `[X]`. Notable highlights:
+
+- **RNF02/RNF03** — JWT (10 min) + refresh token cookie (7 days, HttpOnly, Secure in prod).
+- **RNF05/RN19/RN20** — Dashboard cached in Redis (TTL 300 s); invalidated on every transaction mutation.
+- **RNF06** — Pagination on transactions, categories, and goals (`perPage` up to 100 via query param).
+- **RNF13** — Unit test coverage target ≥ 80% on use cases.
+- **RNF14** — Structured JSON logs via Pino (`src/lib/logger.ts`); `pino-pretty` in dev, raw JSON in prod.
+- **RNF15** — Swagger/OpenAPI docs at `/docs`.
 
 # Mandatory Reviews
 
@@ -155,7 +180,7 @@ Before creating any Pull Request:
 1. Run lint checks.
 
 ```bash
-npm run lint
+npx eslint src
 ```
 
 2. Run unit tests.

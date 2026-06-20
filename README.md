@@ -14,7 +14,6 @@
 - [Sobre o Projeto](#-sobre-o-projeto)
 - [Funcionalidades](#-funcionalidades)
 - [Tecnologias](#-tecnologias)
-- [Tecnologias Planejadas](#-tecnologias-planejadas)
 - [Arquitetura](#-arquitetura)
 - [Pré-requisitos](#-pré-requisitos)
 - [Instalação e Execução](#-instalação-e-execução)
@@ -38,13 +37,16 @@ O **ZAV Finances** é uma API de controle financeiro pessoal desenvolvida com fo
 
 ## ✅ Funcionalidades
 
-- 🔐 Autenticação com JWT e refresh token
-- 💸 Controle de receitas e despesas
-- 🏷️ Categorias personalizadas por usuário
-- 🎯 Metas financeiras com acompanhamento de progresso
-- 📊 Dashboard com resumo mensal e gastos por categoria
-- 🔍 Listagem com filtros avançados e paginação
+- 🔐 Autenticação com JWT (10 min) e refresh token (7 dias) via cookie HttpOnly
+- 💸 Controle de receitas e despesas com filtros avançados
+- 🏷️ Categorias personalizadas (nome, cor hex e ícone) por usuário
+- 🎯 Metas financeiras com acompanhamento de progresso automático
+- 📊 Dashboard com resumo mensal, balanço dos últimos 6 meses e gastos por categoria
+- 🔍 Listagem com filtros por tipo, categoria, período, título e paginação
 - 🗃️ Histórico de transações preservado mesmo ao deletar categorias
+- ⚡ Cache Redis no dashboard com TTL de 5 minutos e invalidação automática
+- 📋 Logs estruturados em JSON via Pino (pino-pretty no desenvolvimento)
+- 📝 Documentação interativa via Swagger em `/docs`
 
 ---
 
@@ -53,25 +55,18 @@ O **ZAV Finances** é uma API de controle financeiro pessoal desenvolvida com fo
 | Camada          | Tecnologia                   |
 | --------------- | ---------------------------- |
 | Runtime         | Node.js v22                  |
-| Linguagem       | TypeScript                   |
-| Framework HTTP  | Fastify                      |
-| ORM             | Prisma                       |
+| Linguagem       | TypeScript 6.x               |
+| Framework HTTP  | Fastify 5.x                  |
+| ORM             | Prisma 7.x                   |
 | Banco de Dados  | PostgreSQL 16                |
 | Cache           | Redis 7                      |
-| Validação       | Zod                          |
-| Testes          | Vitest                       |
-| Autenticação    | JWT                          |
+| Validação       | Zod 4.x                      |
+| Logs            | Pino (embutido no Fastify)   |
+| Testes          | Vitest 4.x                   |
+| Autenticação    | JWT (`@fastify/jwt`)         |
 | Containerização | Docker + Docker Compose      |
 | Documentação    | Swagger (`@fastify/swagger`) |
-
----
-
-## 🚀 Tecnologias Planejadas
-
-| Categoria     | Tecnologia |
-| ------------- | ---------- |
-| Logs          | Pino       |
-| Monitoramento | Sentry     |
+| CI/CD           | GitHub Actions               |
 
 ---
 
@@ -83,7 +78,7 @@ O projeto aplica princípios de Clean Architecture, separando responsabilidades 
 http/         → Interface de entrada da aplicação
 use-cases/    → Casos de uso e regras de negócio
 repositories/ → Contratos e implementações de persistência
-infra/        → Serviços externos e integrações
+infra/        → Serviços externos e integrações (Redis)
 lib/          → Configuração e compartilhamento de dependências
 ```
 
@@ -117,7 +112,7 @@ Essa abordagem permite testar as regras de negócio de forma isolada usando **re
 
 ```bash
 # Clone o repositório
-git clone https://github.com/filipesantanadev/zap-api.git
+git clone https://github.com/filipesantanadev/zav-api.git
 cd zav-api
 
 # Instale as dependências
@@ -132,49 +127,56 @@ docker compose up -d
 # Execute as migrations
 npx prisma migrate dev
 
+# Configure o ambiente de testes E2E (apenas uma vez por máquina)
+npm run pretest:e2e
+
 # Inicie o servidor em modo desenvolvimento
 npm run start:dev
 ```
 
-A API estará disponível em `http://localhost:3333`
+A API estará disponível em `http://localhost:3333`  
+Documentação Swagger: `http://localhost:3333/docs`
 
 ---
 
 ## 📜 Scripts
 
 ```bash
-npm run start:dev      # Desenvolvimento
-npm run build          # Build da aplicação
-npm run start          # Produção
+npm run start:dev      # Desenvolvimento com hot-reload (tsx watch)
+npm run build          # Build de produção (tsup → build/)
+npm run start          # Executa o build de produção
 npm run test           # Testes unitários
+npm run test:watch     # Testes unitários em modo watch
 npm run test:e2e       # Testes end-to-end
-npm run test:coverage  # Coverage
+npm run test:e2e:watch # Testes e2e em modo watch
+npm run test:coverage  # Relatório de cobertura
 ```
 
 ---
 
 ## 🔐 Variáveis de Ambiente
 
-Crie um arquivo `.env` na raiz do projeto com base no `.env.example`:
-
-Consulte `.env.example` para todas as variáveis disponíveis.
+Crie um arquivo `.env` na raiz com base em `.env.example`:
 
 ```env
-# Servidor
-PORT=3333
 NODE_ENV=development
+APP_URL=http://localhost:3333
+
+# CORS — origem do frontend (apenas uma origem)
+CORS_ORIGIN=http://localhost:5173
+
+# Auth
+JWT_SECRET=seu-secret-aqui
 
 # Banco de Dados
-DATABASE_URL="postgresql://finance:finance@localhost:5432/finance_db"
-
-# JWT
-JWT_SECRET="seu-secret-aqui"
-JWT_EXPIRES_IN="7d"
+DATABASE_URL="postgresql://docker:docker@localhost:5432/apizav?schema=public"
 
 # Redis
 REDIS_HOST="localhost"
 REDIS_PORT=6379
 ```
+
+> `REDIS_HOST` é opcional em desenvolvimento (a API usa `lazyConnect`). Em produção deve ser definido.
 
 ---
 
@@ -182,12 +184,13 @@ REDIS_PORT=6379
 
 ### Autenticação
 
-| Método  | Rota             | Descrição                     |
-| ------- | ---------------- | ----------------------------- |
-| `POST`  | `/users`         | Cadastro de usuário           |
-| `POST`  | `/sessions`      | Login (retorna JWT)           |
-| `PATCH` | `/token/refresh` | Refresh token                 |
-| `GET`   | `/me`            | Perfil do usuário autenticado |
+| Método  | Rota             | Descrição                         |
+| ------- | ---------------- | --------------------------------- |
+| `POST`  | `/users`         | Cadastro de usuário               |
+| `POST`  | `/sessions`      | Login (retorna JWT)               |
+| `PATCH` | `/token/refresh` | Renova o JWT via refresh token    |
+| `GET`   | `/me`            | Perfil do usuário autenticado     |
+| `PATCH` | `/me`            | Atualiza dados do perfil          |
 
 ### Transações
 
@@ -227,7 +230,7 @@ REDIS_PORT=6379
 
 ### Documentação
 
-A documentação completa da API está disponível em `http://localhost:3333/docs` após iniciar o servidor.
+A documentação interativa da API está disponível em `http://localhost:3333/docs` após iniciar o servidor.
 
 ---
 
@@ -260,6 +263,8 @@ npm run test:e2e
 ```
 
 Os testes unitários usam **repositórios in-memory** que implementam as mesmas interfaces do banco real, garantindo velocidade e isolamento total.
+
+Os testes e2e criam um schema PostgreSQL isolado por suite (via `vitest-environment-prisma`) e rodam migrations completas antes de cada execução.
 
 ---
 
@@ -303,6 +308,7 @@ src/
 │       └── redis.service.ts    # Implementação Redis
 │
 ├── lib/                        # Configuração e instâncias compartilhadas
+│   ├── logger.ts               # Configuração do Pino por ambiente
 │   └── prisma.ts               # Instância do Prisma Client
 │
 ├── repositories/               # Contratos e implementações dos repositórios
@@ -340,19 +346,21 @@ src/
 
 - [x] Setup inicial (Fastify + Prisma + PostgreSQL)
 - [x] Schema do banco de dados
-- [x] Autenticação com JWT
+- [x] Autenticação com JWT + refresh token via cookie HttpOnly
 - [x] CRUD de categorias
-- [x] CRUD de transações com filtros
-- [x] Metas financeiras
-- [x] Dashboard consolidado
-- [x] Cache com Redis
-- [x] Testes unitários e e2e
+- [x] CRUD de transações com filtros avançados e paginação
+- [x] Metas financeiras com progresso automático
+- [x] Dashboard consolidado com cache Redis
+- [x] Testes unitários (use cases com repositórios in-memory)
+- [x] Testes e2e (controllers via supertest + schema isolado)
 - [x] Documentação com Swagger
 - [x] CI/CD com GitHub Actions
+- [x] Logs estruturados em JSON via Pino
+- [x] Rate limiting (`@fastify/rate-limit`)
+- [x] CORS configurável por ambiente
 
 ### Próximos passos
 
-- [ ] Logs estruturados com Pino
 - [ ] Monitoramento e métricas com Sentry
 - [ ] Deploy
 
