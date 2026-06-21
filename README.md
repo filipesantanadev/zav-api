@@ -51,6 +51,7 @@ O **ZAV Finances** é uma API de controle financeiro pessoal desenvolvida com fo
 - ⚡ Cache Redis no dashboard com TTL de 5 minutos e invalidação automática
 - 📋 Logs estruturados em JSON via Pino (pino-pretty no desenvolvimento)
 - 📝 Documentação interativa via Swagger em `/docs`
+- 🩺 Health check em `/health` com status de banco e cache em tempo real
 
 ---
 
@@ -112,6 +113,7 @@ A API está em produção no **Render**, com PostgreSQL e Redis provisionados na
 |---|---|
 | API | https://zav-api.onrender.com |
 | Documentação Swagger | https://zav-api.onrender.com/docs |
+| Health Check | https://zav-api.onrender.com/health |
 
 > O plano gratuito do Render pode apresentar cold start de alguns segundos na primeira requisição após período de inatividade.
 
@@ -253,6 +255,40 @@ REDIS_PORT=6379
 | ------ | ------------ | -------------------------- |
 | `GET`  | `/dashboard` | Resumo financeiro completo |
 
+### Health Check
+
+| Método | Rota      | Auth | Descrição                              |
+| ------ | --------- | ---- | -------------------------------------- |
+| `GET`  | `/health` | Não  | Status da API e dos serviços de infra  |
+
+**Exemplo de resposta — tudo operacional (`200`):**
+
+```json
+{
+  "status": "UP",
+  "timestamp": "2026-06-21T00:00:00.000Z",
+  "services": {
+    "database": { "status": "UP" },
+    "cache":    { "status": "UP" }
+  }
+}
+```
+
+**Exemplo de resposta — serviço indisponível (`503`):**
+
+```json
+{
+  "status": "DOWN",
+  "timestamp": "2026-06-21T00:00:00.000Z",
+  "services": {
+    "database": { "status": "UP" },
+    "cache":    { "status": "DOWN", "error": "Connection refused" }
+  }
+}
+```
+
+> Rate limit: 30 requisições por minuto. Endpoint público, sem autenticação.
+
 ### Documentação
 
 A documentação interativa da API está disponível em `http://localhost:3333/docs` após iniciar o servidor.
@@ -337,6 +373,7 @@ src/
 │   │   ├── categories/         # Endpoints de categorias
 │   │   ├── dashboards/         # Endpoints do dashboard
 │   │   ├── goals/              # Endpoints de metas
+│   │   ├── health/             # Endpoint de health check
 │   │   ├── transactions/       # Endpoints de transações
 │   │   └── users/              # Endpoints de usuários/autenticação
 │   │
@@ -353,6 +390,7 @@ src/
 │       ├── categories.ts
 │       ├── dashboard.ts
 │       ├── goals.ts
+│       ├── health.ts
 │       ├── transactions.ts
 │       └── users.ts
 │
@@ -413,6 +451,7 @@ src/
 - [x] Rate limiting (`@fastify/rate-limit`)
 - [x] CORS configurável por ambiente
 - [x] Deploy em produção (Render — PostgreSQL + Redis)
+- [x] Health check endpoint (`GET /health`) com status de banco e cache
 
 ### Próximos passos
 
