@@ -10,6 +10,7 @@ import { transactionsRoutes } from './http/controllers/transactions/routes'
 import { categoriesRoutes } from './http/controllers/categories/routes'
 import { goalsRoutes } from './http/controllers/goals/routes'
 import { dashboardRoutes } from './http/controllers/dashboards/routes'
+import { healthRoutes } from './http/controllers/health/routes'
 import { swaggerPlugin } from './http/plugins/swagger'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
@@ -41,6 +42,7 @@ app.register(fastifyJwt, {
 
 app.register(fastifyCookie)
 
+app.register(healthRoutes)
 app.register(usersRoutes)
 app.register(transactionsRoutes)
 app.register(categoriesRoutes)

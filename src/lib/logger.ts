@@ -1,3 +1,4 @@
+import pino from 'pino'
 import type { FastifyServerOptions } from 'fastify'
 import { env } from '@/env'
 
@@ -44,3 +45,7 @@ const loggerOptions: Record<string, FastifyServerOptions['logger']> = {
 }
 
 export const logger = loggerOptions[env.NODE_ENV]
+
+// Standalone Pino instance for use outside of Fastify (e.g. infrastructure singletons).
+// Inherits the same level, redact, and serializer config as the Fastify logger.
+export const log = pino(loggerOptions[env.NODE_ENV] as pino.LoggerOptions)
