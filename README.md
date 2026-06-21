@@ -6,7 +6,7 @@
 ![Node](https://img.shields.io/badge/node-v22-brightgreen)
 ![TypeScript](https://img.shields.io/badge/typescript-6.x-blue)
 ![License](https://img.shields.io/badge/license-ISC-lightgrey)
-[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/filipesantanadev/zap-api/main/coverage-badge.json)](https://github.com/filipesantanadev/zap-api/blob/main/coverage-badge.json)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/filipesantanadev/zav-api/main/coverage-badge.json)](https://github.com/filipesantanadev/zav-api/blob/main/coverage-badge.json)
 [![Deploy](https://img.shields.io/badge/deploy-Render-46E3B7?logo=render)](https://zap-api-uru0.onrender.com)
 [![Swagger](https://img.shields.io/badge/docs-Swagger-85EA2D?logo=swagger)](https://zap-api-uru0.onrender.com/docs)
 
@@ -141,6 +141,9 @@ cp .env.example .env
 # Suba o banco de dados e o Redis
 docker compose up -d
 
+# Gere o Prisma Client
+npx prisma generate
+
 # Execute as migrations
 npx prisma migrate dev
 
@@ -181,8 +184,9 @@ Crie um arquivo `.env` na raiz com base em `.env.example`:
 ```env
 NODE_ENV=development
 APP_URL=http://localhost:3333
+PORT=3333
 
-# CORS — origem do frontend (apenas uma origem)
+# CORS — origens do frontend separadas por vírgula
 CORS_ORIGIN=http://localhost:5173
 
 # Auth
@@ -191,12 +195,13 @@ JWT_SECRET=seu-secret-aqui
 # Banco de Dados
 DATABASE_URL="postgresql://docker:docker@localhost:5432/apizav?schema=public"
 
-# Redis
+# Redis (opcional em desenvolvimento — a API usa lazyConnect)
 REDIS_HOST="localhost"
 REDIS_PORT=6379
 ```
 
-> `REDIS_HOST` é opcional em desenvolvimento (a API usa `lazyConnect`). Em produção deve ser definido.
+> `REDIS_HOST` é opcional em desenvolvimento (a API usa `lazyConnect`). Em produção deve ser definido.  
+> `CORS_ORIGIN` aceita múltiplas origens separadas por vírgula: `http://localhost:5173,https://meuapp.com`.
 
 ---
 
