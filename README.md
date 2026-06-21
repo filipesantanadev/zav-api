@@ -7,8 +7,8 @@
 ![TypeScript](https://img.shields.io/badge/typescript-6.x-blue)
 ![License](https://img.shields.io/badge/license-ISC-lightgrey)
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/filipesantanadev/zav-api/main/coverage-badge.json)](https://github.com/filipesantanadev/zav-api/blob/main/coverage-badge.json)
-[![Deploy](https://img.shields.io/badge/deploy-Render-46E3B7?logo=render)](https://zap-api-uru0.onrender.com)
-[![Swagger](https://img.shields.io/badge/docs-Swagger-85EA2D?logo=swagger)](https://zap-api-uru0.onrender.com/docs)
+[![Deploy](https://img.shields.io/badge/deploy-Render-46E3B7?logo=render)](https://zav-api.onrender.com)
+[![Swagger](https://img.shields.io/badge/docs-Swagger-85EA2D?logo=swagger)](https://zav-api.onrender.com/docs)
 
 ---
 
@@ -110,8 +110,8 @@ A API está em produção no **Render**, com PostgreSQL e Redis provisionados na
 
 | Recurso | URL |
 |---|---|
-| API | https://zap-api-uru0.onrender.com |
-| Documentação Swagger | https://zap-api-uru0.onrender.com/docs |
+| API | https://zav-api.onrender.com |
+| Documentação Swagger | https://zav-api.onrender.com/docs |
 
 > O plano gratuito do Render pode apresentar cold start de alguns segundos na primeira requisição após período de inatividade.
 
@@ -158,7 +158,7 @@ A API estará disponível em `http://localhost:3333`
 Documentação Swagger: `http://localhost:3333/docs`
 
 Para testar sem rodar localmente, use o ambiente de produção:
-`https://zap-api-uru0.onrender.com/docs`
+`https://zav-api.onrender.com/docs`
 
 ---
 
