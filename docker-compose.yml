@@ -2,7 +2,7 @@ version: "3"
 
 services:
   api-zav-pg:
-    image: bitnami/postgresql:16
+    image: bitnami/postgresql:latest
     ports:
       - "127.0.0.1:5432:5432"
     environment:
