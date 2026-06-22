@@ -41,4 +41,40 @@ describe('Delete Transaction (e2e)', () => {
     expect(response.statusCode).toEqual(204)
     expect(transaction).toBeNull()
   })
+
+  it('should not be able to delete a transaction without a token', async () => {
+    const response = await request(app.server)
+      .delete('/transactions/00000000-0000-0000-0000-000000000000')
+
+    expect(response.statusCode).toEqual(401)
+  })
+
+  it('should not be able to delete another user transaction', async () => {
+    const { token: tokenOwner } = await createAndAuthenticateUser(
+      app,
+      'owner@example.com',
+    )
+    const { token: tokenOther } = await createAndAuthenticateUser(
+      app,
+      'other@example.com',
+    )
+
+    const transactionCreated = await request(app.server)
+      .post('/transactions')
+      .set('Authorization', `Bearer ${tokenOwner}`)
+      .send({
+        title: 'Salary DEV Full-Stack',
+        amount: 8500,
+        type: 'INCOME',
+        date: new Date().toISOString().split('T')[0],
+      })
+
+    const transactionId = transactionCreated.body.transaction.id
+
+    const response = await request(app.server)
+      .delete(`/transactions/${transactionId}`)
+      .set('Authorization', `Bearer ${tokenOther}`)
+
+    expect(response.statusCode).toEqual(404)
+  })
 })

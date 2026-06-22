@@ -1,4 +1,5 @@
 import { makeUpdateTransctionUseCase } from '@/use-cases/factories/transactions/make-update-transaction-use-case'
+import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
 
@@ -23,16 +24,24 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
   const { title, amount, type, date, notes, categoryId } =
     updateTransactionBodySchema.parse(request.body)
 
-  const transaction = await updateTransactionUseCase.execute({
-    id,
-    ...(title && { title }),
-    ...(amount && { amount }),
-    ...(type && { type }),
-    ...(date && { date }),
-    ...(notes && { notes }),
-    ...(categoryId && { categoryId }),
-    userId: request.user.sub,
-  })
+  try {
+    const transaction = await updateTransactionUseCase.execute({
+      id,
+      ...(title && { title }),
+      ...(amount && { amount }),
+      ...(type && { type }),
+      ...(date && { date }),
+      ...(notes && { notes }),
+      ...(categoryId && { categoryId }),
+      userId: request.user.sub,
+    })
 
-  return reply.status(204).send(transaction)
+    return reply.status(204).send(transaction)
+  } catch (err) {
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message })
+    }
+
+    throw err
+  }
 }

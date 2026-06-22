@@ -32,4 +32,17 @@ describe('Create Transaction (e2e)', () => {
       }),
     )
   })
+
+  it('should not be able to create a transaction without a token', async () => {
+    const response = await request(app.server)
+      .post('/transactions')
+      .send({
+        title: 'Salary DEV Full-Stack',
+        amount: 8500,
+        type: 'INCOME',
+        date: new Date().toISOString().split('T')[0],
+      })
+
+    expect(response.statusCode).toEqual(401)
+  })
 })
